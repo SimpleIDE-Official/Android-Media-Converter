@@ -90,7 +90,7 @@ public class ExternalStorage {
         hash.append("]");
         if (!mountHash.contains(hash.toString())) {
           String key = SD_CARD + "_" + map.size();
-          if (map.size() == 0) {
+          if (map.isEmpty()) {
             key = SD_CARD;
           } else if (map.size() == 1) {
             key = EXTERNAL_SD_CARD;
