@@ -35,6 +35,36 @@ jobs:
       - name: Build a debug APK
         run: ./gradlew assembleDebug
 
+      - name: Upload app-arm64-v8a Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-arm64-v8a-debug-unsigned-${{ env.SHORT_SHA }}
+          path: app/build/outputs/apk/debug/app-arm64-v8a-debug-unsigned.apk
+      
+      - name: Upload app-armeabi-v7a Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-armeabi-v7a-debug-unsigned-${{ env.SHORT_SHA }}
+          path: app/build/outputs/apk/debug/app-armeabi-v7a-debug-unsigned.apk
+      
+      - name: Upload app-universal Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-universal-release-unsigned-${{ env.SHORT_SHA }}
+          path: app/build/outputs/apk/release/app-universal-debug-unsigned.apk
+      
+      - name: Upload app-x86 Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-x86-debug-unsigned-${{ env.SHORT_SHA }}
+          path: app/build/outputs/apk/debug/app-x86-debug-unsigned.apk
+      
+      - name: Upload app-x86_64 Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-x86_64-debug-unsigned-${{ env.SHORT_SHA }}
+          path: app/build/outputs/apk/debug/app-x86_64-debug-unsigned.apk
+      
       - name: Upload app Artifact
         uses: actions/upload-artifact@v4
         with:
