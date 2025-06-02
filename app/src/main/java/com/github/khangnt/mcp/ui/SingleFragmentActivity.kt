@@ -5,12 +5,10 @@ import android.support.annotation.IdRes
 import android.support.v4.app.Fragment
 import com.github.khangnt.mcp.R
 
-
 /**
  * Jockey clean UI architecture by Marverenic.
  * https://github.com/marverenic/Jockey/blob/master/app/src/main/java/com/marverenic/music/ui/SingleFragmentActivity.java
  */
-
 abstract class SingleFragmentActivity : BaseActivity() {
     companion object {
         private const val CONTENT_FRAGMENT_TAG = "content_fragment"
@@ -36,14 +34,14 @@ abstract class SingleFragmentActivity : BaseActivity() {
     }
 
     protected open fun replaceFragment(newFragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-                .replace(getFragmentContainerId(), newFragment, CONTENT_FRAGMENT_TAG)
-                .commitAllowingStateLoss()
+        supportFragmentManager
+            .beginTransaction()
+            .replace(getFragmentContainerId(), newFragment, CONTENT_FRAGMENT_TAG)
+            .commitAllowingStateLoss()
     }
 
     /**
-     * @return The fragment created in [onCreateFragment], if it is still attached
-     * to this activity.
+     * @return The fragment created in [onCreateFragment], if it is still attached to this activity.
      */
     protected open fun getContentFragment(): Fragment? {
         return supportFragmentManager.findFragmentByTag(CONTENT_FRAGMENT_TAG)
@@ -52,15 +50,14 @@ abstract class SingleFragmentActivity : BaseActivity() {
     /**
      * Creates the layout for this activity. The default implementation is an empty activity where
      * the fragment consumes the entire window.
+     *
      * @see [getFragmentContainerId]
      */
     protected open fun onCreateLayout(savedInstanceState: Bundle?) {
         setContentView(R.layout.single_fragment)
     }
 
-    /**
-     * @return The layout ID that the fragment for this activity should be attached to.
-     */
+    /** @return The layout ID that the fragment for this activity should be attached to. */
     @IdRes
     protected open fun getFragmentContainerId(): Int {
         return R.id.fragmentContainer

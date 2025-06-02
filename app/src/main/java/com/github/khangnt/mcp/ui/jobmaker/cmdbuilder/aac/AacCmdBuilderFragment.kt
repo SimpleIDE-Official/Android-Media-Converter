@@ -14,23 +14,19 @@ import com.github.khangnt.mcp.ui.jobmaker.cmdbuilder.CommandConfig
 import com.github.khangnt.mcp.util.onSeekBarChanged
 import kotlinx.android.synthetic.main.fragment_convert_aac.*
 
-/**
- * Created by Khang NT on 4/10/18.
- * Email: khang.neon.1997@gmail.com
- */
-
+/** Created by Khang NT on 4/10/18. Email: khang.neon.1997@gmail.com */
 class AacCmdBuilderFragment : CommandBuilderFragment() {
 
     companion object {
-        private const val CBR_MIN = 45  // 45 kbps
+        private const val CBR_MIN = 45 // 45 kbps
         private const val CBR_MAX = 320 // 320 kbps
         private const val CBR_RECOMMEND = 256
     }
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View? = inflater.inflate(R.layout.fragment_convert_aac, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -51,14 +47,16 @@ class AacCmdBuilderFragment : CommandBuilderFragment() {
     }
 
     override fun validateConfig(onSuccess: (CommandConfig) -> Unit) {
-        onSuccess(AacCmdConfig(inputFileUris, CBR_MIN + sbQuality.progress, cbTrimSilence.isChecked))
+        onSuccess(
+            AacCmdConfig(inputFileUris, CBR_MIN + sbQuality.progress, cbTrimSilence.isChecked)
+        )
     }
 }
 
 class AacCmdConfig(
-        inputFiles: List<String>,
-        private val quality: Int,
-        private val isTrimSilence: Boolean
+    inputFiles: List<String>,
+    private val quality: Int,
+    private val isTrimSilence: Boolean,
 ) : CommandConfig(inputFiles) {
 
     override fun getNumberOfOutput(): Int = inputFileUris.size // 1 input - 1 output
@@ -69,23 +67,29 @@ class AacCmdConfig(
 
     override fun makeJobs(finalFinalOutputs: List<FinalOutput>): List<Job> {
         check(finalFinalOutputs.size == getNumberOfOutput())
-        val cmdArgs = StringBuffer("-hide_banner -map 0:a -map_metadata 0:g ")
+        val cmdArgs =
+            StringBuffer("-hide_banner -map 0:a -map_metadata 0:g ")
                 .append("-codec:a aac ")
                 .append("-b:a ${quality}k ")
-                .append(when (isTrimSilence) {
-                    true -> "-af silenceremove=1:0:-50dB:1:1:-50dB "
-                    false -> ""
-                })
+                .append(
+                    when (isTrimSilence) {
+                        true -> "-af silenceremove=1:0:-50dB:1:1:-50dB "
+                        false -> ""
+                    }
+                )
                 .toString()
         return finalFinalOutputs.mapIndexed { index, output ->
             Job(
-                    title = output.title,
-                    command = Command(
-                            listOf(inputFileUris[index]), output.outputUri, // single input output
-                            Muxer.IPOD, cmdArgs, emptyMap()
-                    )
+                title = output.title,
+                command =
+                    Command(
+                        listOf(inputFileUris[index]),
+                        output.outputUri, // single input output
+                        Muxer.IPOD,
+                        cmdArgs,
+                        emptyMap(),
+                    ),
             )
         }
     }
-
 }

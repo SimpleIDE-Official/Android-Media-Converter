@@ -13,15 +13,11 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
-import timber.log.Timber
 import java.io.File
 import java.util.*
+import timber.log.Timber
 
-/**
- * Created by Khang NT on 4/4/18.
- * Email: khang.neon.1997@gmail.com
- */
-
+/** Created by Khang NT on 4/4/18. Email: khang.neon.1997@gmail.com */
 class FileBrowserViewModel : ViewModel() {
 
     private val createFolderItem = FileListModel(File("+folder"), TYPE_CREATE_FOLDER, false)
@@ -41,14 +37,20 @@ class FileBrowserViewModel : ViewModel() {
     private val disposable: Disposable
 
     init {
-        val onDirectoryChanged = directorySubject.toFlowable(BackpressureStrategy.LATEST)
+        val onDirectoryChanged =
+            directorySubject
+                .toFlowable(BackpressureStrategy.LATEST)
                 .observeOn(Schedulers.computation())
                 .map<List<FileListModel>> { directory ->
                     statusLiveData.postValue(Status.Loading)
-                    val files = directory.listFilesNotNull().map {
-                        val type = if (it.isDirectory) TYPE_FOLDER else TYPE_FILE
-                        FileListModel(it, type)
-                    }.toMutableList()
+                    val files =
+                        directory
+                            .listFilesNotNull()
+                            .map {
+                                val type = if (it.isDirectory) TYPE_FOLDER else TYPE_FILE
+                                FileListModel(it, type)
+                            }
+                            .toMutableList()
                     files.sortWith(fileListComparator)
                     if (directory.canWrite()) {
                         files.add(0, createFolderItem)
@@ -57,30 +59,31 @@ class FileBrowserViewModel : ViewModel() {
                     return@map files
                 }
 
-        val onSelectedFileChanged = selectedFileSubject.toFlowable(BackpressureStrategy.LATEST)
+        val onSelectedFileChanged =
+            selectedFileSubject
+                .toFlowable(BackpressureStrategy.LATEST)
                 .observeOn(Schedulers.computation())
 
-        disposable = Flowable
-                .combineLatest(onDirectoryChanged, onSelectedFileChanged, updateSelectedStateFunction())
+        disposable =
+            Flowable.combineLatest(
+                    onDirectoryChanged,
+                    onSelectedFileChanged,
+                    updateSelectedStateFunction(),
+                )
                 .onErrorReturn {
                     Timber.d(it)
                     statusLiveData.postValue(Status.Error(it))
                     mutableListOf()
                 }
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { computedFileModels ->
-                    fileModelsLiveData.value = computedFileModels
-                }
+                .subscribe { computedFileModels -> fileModelsLiveData.value = computedFileModels }
     }
 
     private fun updateSelectedStateFunction() =
-            BiFunction<List<FileListModel>, Unit, List<FileListModel>> { list, _ ->
-                list.forEach { model ->
-                    model.selected = selectedFiles.contains(model.path)
-                }
-                return@BiFunction list
-            }
-
+        BiFunction<List<FileListModel>, Unit, List<FileListModel>> { list, _ ->
+            list.forEach { model -> model.selected = selectedFiles.contains(model.path) }
+            return@BiFunction list
+        }
 
     fun setCurrentDirectory(path: File) {
         if (path != currentDirectory) {
@@ -147,5 +150,4 @@ class FileBrowserViewModel : ViewModel() {
         super.onCleared()
         disposable.dispose()
     }
-
 }

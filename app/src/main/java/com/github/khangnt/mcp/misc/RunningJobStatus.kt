@@ -3,7 +3,6 @@ package com.github.khangnt.mcp.misc
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
 
-
 object RunningJobStatus {
     private val subject = BehaviorSubject.create<String>()
 

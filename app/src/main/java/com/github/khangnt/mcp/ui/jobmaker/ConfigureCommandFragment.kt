@@ -12,21 +12,17 @@ import com.github.khangnt.mcp.ui.jobmaker.cmdbuilder.CommandBuilderFragment
 import com.github.khangnt.mcp.util.getViewModel
 import java.io.File
 
-/**
- * Created by Khang NT on 4/10/18.
- * Email: khang.neon.1997@gmail.com
- */
-
+/** Created by Khang NT on 4/10/18. Email: khang.neon.1997@gmail.com */
 class ConfigureCommandFragment : StepFragment() {
 
-    /** Get shared view model via host activity **/
+    /** Get shared view model via host activity * */
     private val jobMakerViewModel by lazy { requireActivity().getViewModel<JobMakerViewModel>() }
     private lateinit var commandBuilderFragment: CommandBuilderFragment
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View? = inflater.inflate(R.layout.single_fragment, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -38,8 +34,8 @@ class ConfigureCommandFragment : StepFragment() {
     }
 
     private fun createCommandBuilderGui(
-            selectedCommand: PresetCommand,
-            selectedFiles: List<File>
+        selectedCommand: PresetCommand,
+        selectedFiles: List<File>,
     ): CommandBuilderFragment {
         val currentFragment = childFragmentManager.findFragmentByTag(selectedCommand.getTag())
         if (currentFragment is CommandBuilderFragment) {
@@ -47,13 +43,17 @@ class ConfigureCommandFragment : StepFragment() {
         }
         // create new one
         val newFragment = selectedCommand.createCommandBuilderFragment()
-        newFragment.arguments = Bundle().apply {
-            putStringArrayList(CommandBuilderFragment.ARG_INPUT_FILE_URIS,
-                    ArrayList(selectedFiles.map { Uri.fromFile(it).toString() }))
-        }
-        childFragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainer, newFragment, selectedCommand.getTag())
-                .commit()
+        newFragment.arguments =
+            Bundle().apply {
+                putStringArrayList(
+                    CommandBuilderFragment.ARG_INPUT_FILE_URIS,
+                    ArrayList(selectedFiles.map { Uri.fromFile(it).toString() }),
+                )
+            }
+        childFragmentManager
+            .beginTransaction()
+            .replace(R.id.fragmentContainer, newFragment, selectedCommand.getTag())
+            .commit()
         return newFragment
     }
 
@@ -63,5 +63,4 @@ class ConfigureCommandFragment : StepFragment() {
             jobMakerViewModel.setCurrentStep(STEP_CHOOSE_OUTPUT_FOLDER_AND_REVIEW)
         }
     }
-
 }

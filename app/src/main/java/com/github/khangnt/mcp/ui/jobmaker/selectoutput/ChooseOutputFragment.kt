@@ -14,7 +14,6 @@ import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import com.github.khangnt.mcp.R
 import com.github.khangnt.mcp.SingletonInstances
 import com.github.khangnt.mcp.dialog.InputDialogFragment
@@ -26,18 +25,13 @@ import com.github.khangnt.mcp.ui.jobmaker.StepFragment
 import com.github.khangnt.mcp.ui.jobmaker.cmdbuilder.CommandConfig
 import com.github.khangnt.mcp.util.*
 import io.fabric.sdk.android.services.network.HttpRequest.post
-import kotlinx.android.synthetic.main.fragment_choose_output.*
 import java.io.File
 import kotlin.concurrent.thread
+import kotlinx.android.synthetic.main.fragment_choose_output.*
 
-
-/**
- * Created by Khang NT on 4/11/18.
- * Email: khang.neon.1997@gmail.com
- */
-
-class ChooseOutputFragment : StepFragment(), InputDialogFragment.Callbacks,
-        InputDialogFragment.CheckInputCallback {
+/** Created by Khang NT on 4/11/18. Email: khang.neon.1997@gmail.com */
+class ChooseOutputFragment :
+    StepFragment(), InputDialogFragment.Callbacks, InputDialogFragment.CheckInputCallback {
 
     companion object {
         private const val RC_PICK_DOCUMENT_TREE = 2
@@ -48,24 +42,24 @@ class ChooseOutputFragment : StepFragment(), InputDialogFragment.Callbacks,
         private const val EXTRA_INIT_VALUE = "ChooseOutputFragment.InitValue"
     }
 
-    /** Get shared view model via host activity **/
+    /** Get shared view model via host activity * */
     private val jobMakerViewModel by lazy { requireActivity().getViewModel<JobMakerViewModel>() }
     private val chooseOutputViewModel by lazy { getViewModel<ChooseOutputViewModel>() }
     private val adapter: MixAdapter by lazy {
         MixAdapter.Builder {
-            withModel<OutputFileAdapterModel> {
-                ItemOutputFileViewHolder.Factory {
-                    onEdit = { model, index ->
-                        this@ChooseOutputFragment.onEdit(index, model.fileName)
-                    }
-                    onResolveConflict = { model, index ->
-                        this@ChooseOutputFragment.onResolveConflict(index, model.fileName)
+                withModel<OutputFileAdapterModel> {
+                    ItemOutputFileViewHolder.Factory {
+                        onEdit = { model, index ->
+                            this@ChooseOutputFragment.onEdit(index, model.fileName)
+                        }
+                        onResolveConflict = { model, index ->
+                            this@ChooseOutputFragment.onResolveConflict(index, model.fileName)
+                        }
                     }
                 }
             }
-        }.build()
+            .build()
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,9 +67,9 @@ class ChooseOutputFragment : StepFragment(), InputDialogFragment.Callbacks,
     }
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View? = inflater.inflate(R.layout.fragment_choose_output, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -83,18 +77,17 @@ class ChooseOutputFragment : StepFragment(), InputDialogFragment.Callbacks,
 
         edOutputPath.setOnClickListener {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
+                val intent =
+                    Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
                         .putExtra("android.content.extra.SHOW_ADVANCED", true)
                 try {
                     startActivityForResult(intent, RC_PICK_DOCUMENT_TREE)
                     return@setOnClickListener
-                } catch (ignore: ActivityNotFoundException) {
-                }
+                } catch (ignore: ActivityNotFoundException) {}
             }
             val intent = FilePickerActivity.pickFolderIntent(it.context, ensureWritable = true)
             startActivityForResult(intent, RC_PICK_FOLDER)
         }
-
 
         recyclerView.adapter = adapter
 
@@ -108,13 +101,9 @@ class ChooseOutputFragment : StepFragment(), InputDialogFragment.Callbacks,
             }
         }
 
-        chooseOutputViewModel.getListOutputFile().observe {
-            adapter.setData(it)
-        }
+        chooseOutputViewModel.getListOutputFile().observe { adapter.setData(it) }
 
-        chooseOutputViewModel.getOutputFolderUri().observe {
-            updateOutputPathAsync(it)
-        }
+        chooseOutputViewModel.getOutputFolderUri().observe { updateOutputPathAsync(it) }
     }
 
     private fun updateOutputPathAsync(outputFolderUri: Uri) {
@@ -147,10 +136,13 @@ class ChooseOutputFragment : StepFragment(), InputDialogFragment.Callbacks,
             RC_PICK_DOCUMENT_TREE -> {
                 // >= LOLLIPOP only
                 val uri = data!!.data
-                val takeFlags = data.flags and
+                val takeFlags =
+                    data.flags and
                         (FLAG_GRANT_READ_URI_PERMISSION or FLAG_GRANT_WRITE_URI_PERMISSION)
-                if (data.flags and FLAG_GRANT_PERSISTABLE_URI_PERMISSION
-                        == FLAG_GRANT_PERSISTABLE_URI_PERMISSION) {
+                if (
+                    data.flags and FLAG_GRANT_PERSISTABLE_URI_PERMISSION ==
+                        FLAG_GRANT_PERSISTABLE_URI_PERMISSION
+                ) {
                     context!!.contentResolver.takePersistableUriPermission(uri, takeFlags)
                 }
 
@@ -174,8 +166,7 @@ class ChooseOutputFragment : StepFragment(), InputDialogFragment.Callbacks,
         val createFinalOutput: (fileName: String) -> CommandConfig.FinalOutput
         val outputFolderUri = checkNotNull(chooseOutputViewModel.getOutputFolderUri().value)
         if (outputFolderUri.scheme == ContentResolver.SCHEME_CONTENT) {
-            val documentFile = DocumentFile.fromTreeUri(requireContext(),
-                    outputFolderUri)
+            val documentFile = DocumentFile.fromTreeUri(requireContext(), outputFolderUri)
             createFinalOutput = { fileName ->
                 val file = documentFile.createFile(null, fileName)
                 if (file == null) {
@@ -191,14 +182,15 @@ class ChooseOutputFragment : StepFragment(), InputDialogFragment.Callbacks,
             }
         }
 
-        val finalOutputs = checkNotNull(chooseOutputViewModel.getListOutputFile().value).map {
-            try {
-                createFinalOutput(it.fileName)
-            } catch (ignore: IllegalStateException) {
-                // abort
-                return
+        val finalOutputs =
+            checkNotNull(chooseOutputViewModel.getListOutputFile().value).map {
+                try {
+                    createFinalOutput(it.fileName)
+                } catch (ignore: IllegalStateException) {
+                    // abort
+                    return
+                }
             }
-        }
 
         jobMakerViewModel.getCommandConfig().makeJobs(finalOutputs).forEach { job ->
             SingletonInstances.getJobWorkerManager().addJob(job)
@@ -210,8 +202,10 @@ class ChooseOutputFragment : StepFragment(), InputDialogFragment.Callbacks,
         if (dialog.arguments!!.getString(EXTRA_INIT_VALUE) == input) {
             return null
         }
-        if (chooseOutputViewModel.getListFolderFileNames().contains(input)
-                || chooseOutputViewModel.getListOutputFileNames().contains(input)) {
+        if (
+            chooseOutputViewModel.getListFolderFileNames().contains(input) ||
+                chooseOutputViewModel.getListOutputFileNames().contains(input)
+        ) {
             return getString(R.string.file_exists)
         } else if (input.length < 3) {
             return getString(R.string.error_input_too_short)
@@ -228,31 +222,34 @@ class ChooseOutputFragment : StepFragment(), InputDialogFragment.Callbacks,
 
     private fun onEdit(index: Int, initValue: String) {
         InputDialogFragment.Builder()
-                .setEnableError(true)
-                .setHint(getString(R.string.hint_file_name))
-                .setTitle(getString(R.string.output_file_name_hint))
-                .setInitValue(initValue)
-                .setExtra(EXTRA_OUTPUT_INDEX, index)
-                .setExtra(EXTRA_INIT_VALUE, initValue)
-                .setMaxLines(1)
-                .build()
-                .show(childFragmentManager, INPUT_DIALOG_TAG)
+            .setEnableError(true)
+            .setHint(getString(R.string.hint_file_name))
+            .setTitle(getString(R.string.output_file_name_hint))
+            .setInitValue(initValue)
+            .setExtra(EXTRA_OUTPUT_INDEX, index)
+            .setExtra(EXTRA_INIT_VALUE, initValue)
+            .setMaxLines(1)
+            .build()
+            .show(childFragmentManager, INPUT_DIALOG_TAG)
     }
 
     private fun onResolveConflict(index: Int, currentFileName: String) {
         AlertDialog.Builder(context!!)
-                .setTitle(R.string.dialog_error_file_exists)
-                .setMessage(getString(R.string.dialog_error_file_exists_message, currentFileName))
-                .setCancelable(true)
-                .setPositiveButton(R.string.action_rename, { _, _ ->
+            .setTitle(R.string.dialog_error_file_exists)
+            .setMessage(getString(R.string.dialog_error_file_exists_message, currentFileName))
+            .setCancelable(true)
+            .setPositiveButton(
+                R.string.action_rename,
+                { _, _ ->
                     // show rename dialog
                     onEdit(index, currentFileName)
-                })
-                .setNegativeButton(R.string.action_override, { _, _ ->
-                    chooseOutputViewModel.updateOutput(index, allowOverride = true)
-                })
-                .setNeutralButton(R.string.action_cancel, null)
-                .show()
+                },
+            )
+            .setNegativeButton(
+                R.string.action_override,
+                { _, _ -> chooseOutputViewModel.updateOutput(index, allowOverride = true) },
+            )
+            .setNeutralButton(R.string.action_cancel, null)
+            .show()
     }
-
 }

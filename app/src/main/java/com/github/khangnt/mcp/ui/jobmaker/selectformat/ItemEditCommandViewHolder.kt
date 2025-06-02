@@ -8,22 +8,14 @@ import com.github.khangnt.mcp.R
 import com.github.khangnt.mcp.ui.common.*
 import kotlinx.android.synthetic.main.item_edit_command.view.*
 
-/**
- * Created by Khang NT on 5/5/18.
- * Email: khang.neon.1997@gmail.com
- */
-
-data class EditCommandModel(
-        val editCommand: EditCommand,
-        val enabled: Boolean
-) : AdapterModel, HasIdLong {
+/** Created by Khang NT on 5/5/18. Email: khang.neon.1997@gmail.com */
+data class EditCommandModel(val editCommand: EditCommand, val enabled: Boolean) :
+    AdapterModel, HasIdLong {
     override val idLong: Long = IdGenerator.idFor(editCommand.name)
 }
 
-class ItemEditCommandViewHolder(
-        itemView: View,
-        onClick: (EditCommandModel) -> Unit
-) : CustomViewHolder<EditCommandModel>(itemView) {
+class ItemEditCommandViewHolder(itemView: View, onClick: (EditCommandModel) -> Unit) :
+    CustomViewHolder<EditCommandModel>(itemView) {
 
     private val ivCardBackground = itemView.ivCardBackground
     private val ivIcon = itemView.ivIcon
@@ -32,9 +24,7 @@ class ItemEditCommandViewHolder(
     private var currentModel: EditCommandModel? = null
 
     init {
-        itemView.setOnClickListener {
-            onClick(checkNotNull(currentModel))
-        }
+        itemView.setOnClickListener { onClick(checkNotNull(currentModel)) }
     }
 
     override fun bind(model: EditCommandModel, pos: Int) {
@@ -43,7 +33,8 @@ class ItemEditCommandViewHolder(
             with(model.editCommand) {
                 val gradientColor = if (model.enabled) gradient else Gradient.Disabled
                 ivCardBackground.setImageDrawable(
-                        gradientColor.getDrawable(GradientDrawable.Orientation.TL_BR))
+                    gradientColor.getDrawable(GradientDrawable.Orientation.TL_BR)
+                )
                 ivIcon.setImageResource(iconRes)
                 tvLabel.alpha = if (model.enabled) 1.0f else 0.5f
                 ivIcon.alpha = if (model.enabled) 1.0f else 0.5f
@@ -64,5 +55,4 @@ class ItemEditCommandViewHolder(
             return ItemEditCommandViewHolder(itemView, onClick)
         }
     }
-
 }

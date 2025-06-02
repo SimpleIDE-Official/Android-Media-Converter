@@ -8,22 +8,14 @@ import com.github.khangnt.mcp.R
 import com.github.khangnt.mcp.ui.common.*
 import kotlinx.android.synthetic.main.item_convert_command.view.*
 
-/**
- * Created by Khang NT on 5/5/18.
- * Email: khang.neon.1997@gmail.com
- */
-
-data class ConvertCommandModel(
-        val command: ConvertCommand,
-        val enabled: Boolean
-) : AdapterModel, HasIdLong {
+/** Created by Khang NT on 5/5/18. Email: khang.neon.1997@gmail.com */
+data class ConvertCommandModel(val command: ConvertCommand, val enabled: Boolean) :
+    AdapterModel, HasIdLong {
     override val idLong: Long = IdGenerator.idFor(command.name)
 }
 
-class ItemConvertCommandViewHolder(
-        itemView: View,
-        onClick: (ConvertCommandModel) -> Unit
-) : CustomViewHolder<ConvertCommandModel>(itemView) {
+class ItemConvertCommandViewHolder(itemView: View, onClick: (ConvertCommandModel) -> Unit) :
+    CustomViewHolder<ConvertCommandModel>(itemView) {
 
     private val ivCardBackground = itemView.ivCardBackground
     private val tvShortName = itemView.tvShortName
@@ -31,9 +23,7 @@ class ItemConvertCommandViewHolder(
     private var currentModel: ConvertCommandModel? = null
 
     init {
-        itemView.setOnClickListener {
-            onClick(checkNotNull(currentModel))
-        }
+        itemView.setOnClickListener { onClick(checkNotNull(currentModel)) }
     }
 
     override fun bind(model: ConvertCommandModel, pos: Int) {
@@ -42,12 +32,12 @@ class ItemConvertCommandViewHolder(
             with(model.command) {
                 val gradientColor = if (model.enabled) gradient else Gradient.Disabled
                 ivCardBackground.setImageDrawable(
-                        gradientColor.getDrawable(GradientDrawable.Orientation.TL_BR))
+                    gradientColor.getDrawable(GradientDrawable.Orientation.TL_BR)
+                )
                 tvShortName.alpha = if (model.enabled) 1.0f else 0.5f
                 tvShortName.setText(shortName)
             }
         }
-
     }
 
     class Factory(init: Factory.() -> Unit) : ViewHolderFactory {
@@ -62,5 +52,4 @@ class ItemConvertCommandViewHolder(
             return ItemConvertCommandViewHolder(itemView, onClick)
         }
     }
-
 }

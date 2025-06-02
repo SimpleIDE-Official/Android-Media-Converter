@@ -14,31 +14,28 @@ import com.github.khangnt.mcp.util.getViewModel
 import com.github.khangnt.mcp.util.toast
 import kotlinx.android.synthetic.main.fragment_selected_files.*
 
-/**
- * Created by Khang NT on 4/6/18.
- * Email: khang.neon.1997@gmail.com
- */
-
+/** Created by Khang NT on 4/6/18. Email: khang.neon.1997@gmail.com */
 class SelectedFilesFragment : StepFragment() {
 
-    /** Get shared view model via host activity **/
+    /** Get shared view model via host activity * */
     private val jobMakerViewModel by lazy { requireActivity().getViewModel<JobMakerViewModel>() }
     private val itemTouchHelper by lazy { ItemTouchHelper(makeItemTouchHelperCallback()) }
     private val adapter: MixAdapter by lazy {
         MixAdapter.Builder {
-            withModel<FileModel> {
-                ItemFileViewHolder.Factory {
-                    onStartDrag = { itemTouchHelper.startDrag(it) }
-                    onRemoveFile = { jobMakerViewModel.removeSelectedFiles(it) }
+                withModel<FileModel> {
+                    ItemFileViewHolder.Factory {
+                        onStartDrag = { itemTouchHelper.startDrag(it) }
+                        onRemoveFile = { jobMakerViewModel.removeSelectedFiles(it) }
+                    }
                 }
             }
-        }.build()
+            .build()
     }
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View? = inflater.inflate(R.layout.fragment_selected_files, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -61,47 +58,49 @@ class SelectedFilesFragment : StepFragment() {
         }
     }
 
-    private fun makeItemTouchHelperCallback() = object : ItemTouchHelper.Callback() {
+    private fun makeItemTouchHelperCallback() =
+        object : ItemTouchHelper.Callback() {
 
-        private var dragFrom = -1
-        private var dragTo = -1
+            private var dragFrom = -1
+            private var dragTo = -1
 
-        override fun isItemViewSwipeEnabled(): Boolean = false
+            override fun isItemViewSwipeEnabled(): Boolean = false
 
-        override fun isLongPressDragEnabled(): Boolean = false
+            override fun isLongPressDragEnabled(): Boolean = false
 
-        override fun onSwiped(viewHolder: RecyclerView.ViewHolder?, direction: Int) = Unit
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder?, direction: Int) = Unit
 
-        override fun getMovementFlags(
+            override fun getMovementFlags(
                 recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder
-        ): Int {
-            return makeMovementFlags(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0)
-        }
+                viewHolder: RecyclerView.ViewHolder,
+            ): Int {
+                return makeMovementFlags(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0)
+            }
 
-        override fun onMove(
+            override fun onMove(
                 recyclerView: RecyclerView?,
                 viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
-        ): Boolean {
-            if (dragFrom == -1) {
-                dragFrom = viewHolder.adapterPosition
+                target: RecyclerView.ViewHolder,
+            ): Boolean {
+                if (dragFrom == -1) {
+                    dragFrom = viewHolder.adapterPosition
+                }
+                dragTo = target.adapterPosition
+                adapter.onItemMove(viewHolder.adapterPosition, target.adapterPosition)
+                return true
             }
-            dragTo = target.adapterPosition
-            adapter.onItemMove(viewHolder.adapterPosition, target.adapterPosition)
-            return true
-        }
 
-        override fun clearView(recyclerView: RecyclerView?, viewHolder: RecyclerView.ViewHolder?) {
-            super.clearView(recyclerView, viewHolder)
-            // update selected files
-            if (dragFrom != -1 && dragTo != -1 && dragFrom != dragTo) {
-                jobMakerViewModel.moveSelectedFiles(dragFrom, dragTo)
+            override fun clearView(
+                recyclerView: RecyclerView?,
+                viewHolder: RecyclerView.ViewHolder?,
+            ) {
+                super.clearView(recyclerView, viewHolder)
+                // update selected files
+                if (dragFrom != -1 && dragTo != -1 && dragFrom != dragTo) {
+                    jobMakerViewModel.moveSelectedFiles(dragFrom, dragTo)
+                }
+                dragFrom = -1
+                dragTo = -1
             }
-            dragFrom = -1
-            dragTo = -1
         }
-
-    }
-
 }

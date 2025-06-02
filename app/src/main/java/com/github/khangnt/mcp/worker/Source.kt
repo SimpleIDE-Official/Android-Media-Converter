@@ -8,17 +8,13 @@ import com.github.khangnt.mcp.DEFAULT_CONNECTION_TIMEOUT
 import com.github.khangnt.mcp.SingletonInstances
 import com.github.khangnt.mcp.exception.HttpResponseCodeException
 import com.github.khangnt.mcp.util.closeQuietly
+import java.io.*
+import java.net.ServerSocket
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import timber.log.Timber
-import java.io.*
-import java.net.ServerSocket
 
-/**
- * Created by Khang NT on 1/1/18.
- * Email: khang.neon.1997@gmail.com
- */
-
+/** Created by Khang NT on 1/1/18. Email: khang.neon.1997@gmail.com */
 object Sources {
     fun from(inputStream: InputStream): SourceInputStream {
         return object : SourceInputStream {
@@ -39,34 +35,37 @@ interface SourceOutputStream : Closeable {
     fun openOutputStream(): OutputStream
 }
 
-class ContentResolverSource(
-        context: Context,
-        private val uri: Uri
-) : SourceInputStream, SourceOutputStream {
+class ContentResolverSource(context: Context, private val uri: Uri) :
+    SourceInputStream, SourceOutputStream {
 
     private val contentResolver: ContentResolver = context.applicationContext.contentResolver
 
     init {
-        if (uri.scheme != ContentResolver.SCHEME_CONTENT
-                && uri.scheme != ContentResolver.SCHEME_FILE) {
-            throw IllegalArgumentException("Only accept scheme '${ContentResolver.SCHEME_CONTENT}'" +
-                    "and '${ContentResolver.SCHEME_FILE}' but found ${uri.scheme}")
+        if (
+            uri.scheme != ContentResolver.SCHEME_CONTENT &&
+                uri.scheme != ContentResolver.SCHEME_FILE
+        ) {
+            throw IllegalArgumentException(
+                "Only accept scheme '${ContentResolver.SCHEME_CONTENT}'" +
+                    "and '${ContentResolver.SCHEME_FILE}' but found ${uri.scheme}"
+            )
         }
     }
 
-    override fun openInputStream(): InputStream = BufferedInputStream(contentResolver.openInputStream(uri))
+    override fun openInputStream(): InputStream =
+        BufferedInputStream(contentResolver.openInputStream(uri))
 
-    override fun openOutputStream(): OutputStream = BufferedOutputStream(contentResolver.openOutputStream(uri))
+    override fun openOutputStream(): OutputStream =
+        BufferedOutputStream(contentResolver.openOutputStream(uri))
 
     override fun close() {
         // does nothing
     }
-
 }
 
 class ServerSocketSourceOutput(
-        private val serverSocket: ServerSocket,
-        timeout: Int = DEFAULT_CONNECTION_TIMEOUT
+    private val serverSocket: ServerSocket,
+    timeout: Int = DEFAULT_CONNECTION_TIMEOUT,
 ) : SourceOutputStream {
 
     private var acceptedConnection = false
@@ -99,16 +98,17 @@ class ServerSocketSourceOutput(
 }
 
 class HttpSourceInput(
-        context: Context,
-        private val request: Request,
-        private val okHttpClient: OkHttpClient = SingletonInstances.getOkHttpClient()
-): SourceInputStream {
+    context: Context,
+    private val request: Request,
+    private val okHttpClient: OkHttpClient = SingletonInstances.getOkHttpClient(),
+) : SourceInputStream {
     constructor(context: Context, url: String) : this(context, Request.Builder().url(url).build())
 
     private val wifiWakeLock: WifiManager.WifiLock
 
     init {
-        val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        val wifiManager =
+            context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
         wifiWakeLock = wifiManager.createWifiLock("ConverterWifiLock")
     }
 
@@ -121,19 +121,23 @@ class HttpSourceInput(
                 releaseWifi()
                 // because this request failed, try get error body and close this Response object
                 this.use {
-                    throw HttpResponseCodeException(this.code(), this.message(),
-                            this.body()?.string() ?: "")
+                    throw HttpResponseCodeException(
+                        this.code(),
+                        this.message(),
+                        this.body()?.string() ?: "",
+                    )
                 }
             }
         }
     }
 
-    override fun openInputStream(): InputStream = object : BufferedInputStream(response.body()!!.byteStream()) {
-        override fun close() {
-            releaseWifi()
-            super.close()
+    override fun openInputStream(): InputStream =
+        object : BufferedInputStream(response.body()!!.byteStream()) {
+            override fun close() {
+                releaseWifi()
+                super.close()
+            }
         }
-    }
 
     override fun close() {
         releaseWifi()
@@ -149,5 +153,4 @@ class HttpSourceInput(
     private fun releaseWifi() {
         if (wifiWakeLock.isHeld) wifiWakeLock.release()
     }
-
 }

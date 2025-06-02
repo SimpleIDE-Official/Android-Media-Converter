@@ -20,7 +20,6 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_job_logs.*
 import timber.log.Timber
 
-
 private const val EXTRA_JOB_ID = "JobLogsActivity:jobId"
 private const val EXTRA_JOB_TITLE = "JobLogsActivity:jobTitle"
 
@@ -28,9 +27,11 @@ class JobLogsActivity : BaseActivity() {
 
     companion object {
         fun launch(context: Context, jobId: Long, jobTitle: String) {
-            context.startActivity(Intent(context, JobLogsActivity::class.java)
+            context.startActivity(
+                Intent(context, JobLogsActivity::class.java)
                     .putExtra(EXTRA_JOB_ID, jobId)
-                    .putExtra(EXTRA_JOB_TITLE, jobTitle))
+                    .putExtra(EXTRA_JOB_TITLE, jobTitle)
+            )
         }
     }
 
@@ -96,8 +97,8 @@ class JobLogsActivity : BaseActivity() {
         setRefreshing(true)
 
         disposable?.dispose() // cancel previous loading if it still not finish
-        disposable = Observable
-                .fromCallable {
+        disposable =
+            Observable.fromCallable {
                     val workingPaths = makeWorkingPaths(this)
                     val logFile = workingPaths.getLogFileOfJob(jobId)
                     return@fromCallable logFile.readText()
@@ -105,16 +106,19 @@ class JobLogsActivity : BaseActivity() {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doFinally { setRefreshing(false) }
-                .subscribe({ text ->
-                    tvLogs.clearFocus()
-                    tvLogs.text = text
-                    tvErrorMessage.visibility = View.GONE
-                }, { error ->
-                    Timber.d(error, "Error when load log of job $jobId")
-                    tvLogs.text = null
-                    tvErrorMessage.text = error.message
-                    tvErrorMessage.visibility = View.VISIBLE
-                })
+                .subscribe(
+                    { text ->
+                        tvLogs.clearFocus()
+                        tvLogs.text = text
+                        tvErrorMessage.visibility = View.GONE
+                    },
+                    { error ->
+                        Timber.d(error, "Error when load log of job $jobId")
+                        tvLogs.text = null
+                        tvErrorMessage.text = error.message
+                        tvErrorMessage.visibility = View.VISIBLE
+                    },
+                )
                 .disposeOnDestroyed()
     }
 
@@ -123,27 +127,35 @@ class JobLogsActivity : BaseActivity() {
 
         val selected = arrayOf(0)
         SingletonInstances.getJobRepository()
-                .getJobsByStatus(JobStatus.RUNNING, JobStatus.COMPLETED, JobStatus.FAILED)
-                .observeOn(AndroidSchedulers.mainThread())
-                .doFinally { tvJobTitle.isEnabled = true }
-                .subscribe ({ jobList ->
-                    val selectOptions = Array(jobList.size, { index -> jobList[index].title})
+            .getJobsByStatus(JobStatus.RUNNING, JobStatus.COMPLETED, JobStatus.FAILED)
+            .observeOn(AndroidSchedulers.mainThread())
+            .doFinally { tvJobTitle.isEnabled = true }
+            .subscribe(
+                { jobList ->
+                    val selectOptions = Array(jobList.size, { index -> jobList[index].title })
                     selected[0] = jobList.indexOfFirst { it.id == jobId }
 
                     AlertDialog.Builder(this)
-                            .setSingleChoiceItems(selectOptions, selected[0], { _, which ->
-                                selected[0] = which
-                            })
-                            .setTitle(getString(R.string.switch_job_dialog_title))
-                            .setPositiveButton(R.string.action_ok, { _, _ ->
+                        .setSingleChoiceItems(
+                            selectOptions,
+                            selected[0],
+                            { _, which -> selected[0] = which },
+                        )
+                        .setTitle(getString(R.string.switch_job_dialog_title))
+                        .setPositiveButton(
+                            R.string.action_ok,
+                            { _, _ ->
                                 setJobInfo(jobList[selected[0]].id, selectOptions[selected[0]])
-                            })
-                            .setNegativeButton(R.string.action_cancel, null)
-                            .show()
-                }, { error ->
+                            },
+                        )
+                        .setNegativeButton(R.string.action_cancel, null)
+                        .show()
+                },
+                { error ->
                     Timber.d(error)
                     toast(error.message)
-                })
-                .disposeOnPaused()
+                },
+            )
+            .disposeOnPaused()
     }
 }

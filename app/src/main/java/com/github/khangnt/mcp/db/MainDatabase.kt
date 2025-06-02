@@ -8,8 +8,7 @@ import android.arch.persistence.room.migration.Migration
 import com.github.khangnt.mcp.db.job.Job
 import com.github.khangnt.mcp.db.job.JobDao
 
-
-//const val DB_VERSION = 1
+// const val DB_VERSION = 1
 const val DB_VERSION = 2
 const val DB_NAME = "main_db"
 
@@ -21,7 +20,8 @@ abstract class MainDatabase : RoomDatabase() {
 
 class Migration1To2 : Migration(1, 2) {
     override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("""
+        database.execSQL(
+            """
             CREATE TABLE IF NOT EXISTS `jobs_v2` (
                 `_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 `title` TEXT NOT NULL,
@@ -29,13 +29,17 @@ class Migration1To2 : Migration(1, 2) {
                 `status_detail` TEXT,
                 `command` TEXT NOT NULL
             )
-        """)
+        """
+        )
 
-        database.execSQL("""
+        database.execSQL(
+            """
             CREATE  INDEX `index_jobs_v2_status` ON `jobs_v2` (`status`)
-        """)
+        """
+        )
 
-        database.execSQL("""
+        database.execSQL(
+            """
             INSERT INTO jobs_v2 (_id, title, status_detail, command, status)
             SELECT _id, title, status_detail, command, CASE status
                     WHEN 0 THEN 5
@@ -46,7 +50,8 @@ class Migration1To2 : Migration(1, 2) {
                     ELSE status
                 END status
             FROM jobs
-            """)
+            """
+        )
 
         database.execSQL("DROP TABLE jobs") // drop `jobs` version 1
     }

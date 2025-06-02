@@ -2,30 +2,25 @@ package com.github.khangnt.mcp.ui.jobmaker.selectoutput
 
 import android.annotation.SuppressLint
 import android.graphics.Color
-import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import com.github.khangnt.mcp.R
 import com.github.khangnt.mcp.ui.common.*
 import kotlinx.android.synthetic.main.item_output_files.view.*
 
-/**
- * Created by Simon Pham on 5/8/18.
- * Email: simonpham.dn@gmail.com
- */
-
+/** Created by Simon Pham on 5/8/18. Email: simonpham.dn@gmail.com */
 data class OutputFileAdapterModel(
-        val fileName: String,
-        val isConflict: Boolean = false,
-        val isOverrideAllowed: Boolean = false
+    val fileName: String,
+    val isConflict: Boolean = false,
+    val isOverrideAllowed: Boolean = false,
 ) : AdapterModel, HasIdLong {
     override val idLong: Long = IdGenerator.idFor(fileName)
 }
 
 class ItemOutputFileViewHolder(
-        itemView: View,
-        onEdit: (model: OutputFileAdapterModel, position: Int) -> Unit,
-        onResolveConflict: (model: OutputFileAdapterModel, position: Int) -> Unit
+    itemView: View,
+    onEdit: (model: OutputFileAdapterModel, position: Int) -> Unit,
+    onResolveConflict: (model: OutputFileAdapterModel, position: Int) -> Unit,
 ) : CustomViewHolder<OutputFileAdapterModel>(itemView) {
 
     private val context = itemView.context
@@ -87,5 +82,4 @@ class ItemOutputFileViewHolder(
             return ItemOutputFileViewHolder(itemView, onEdit, onResolveConflict)
         }
     }
-
 }

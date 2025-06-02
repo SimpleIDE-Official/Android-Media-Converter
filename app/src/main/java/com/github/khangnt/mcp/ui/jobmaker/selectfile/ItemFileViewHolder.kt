@@ -4,22 +4,18 @@ import android.view.MotionEvent
 import android.view.View
 import com.github.khangnt.mcp.R
 import com.github.khangnt.mcp.ui.common.*
-import kotlinx.android.synthetic.main.item_selected_file.view.*
 import java.io.File
+import kotlinx.android.synthetic.main.item_selected_file.view.*
 
-/**
- * Created by Simon Pham on 4/13/18.
- * Email: simonpham.dn@gmail.com
- */
-
+/** Created by Simon Pham on 4/13/18. Email: simonpham.dn@gmail.com */
 data class FileModel(val file: File) : AdapterModel, HasIdLong {
     override val idLong: Long = IdGenerator.idFor(file.absolutePath)
 }
 
 class ItemFileViewHolder(
-        itemView: View,
-        onStartDrag: (ItemFileViewHolder) -> Unit,
-        onRemoveFile: (File) -> Unit
+    itemView: View,
+    onStartDrag: (ItemFileViewHolder) -> Unit,
+    onRemoveFile: (File) -> Unit,
 ) : CustomViewHolder<FileModel>(itemView) {
 
     private val ivRemoveFile = itemView.ivRemove
@@ -30,9 +26,7 @@ class ItemFileViewHolder(
     private var currentFile: File? = null
 
     init {
-        ivRemoveFile.setOnClickListener {
-            onRemoveFile.invoke(checkNotNull(currentFile))
-        }
+        ivRemoveFile.setOnClickListener { onRemoveFile.invoke(checkNotNull(currentFile)) }
         vDragHandle.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 onStartDrag(this)
@@ -64,5 +58,4 @@ class ItemFileViewHolder(
             return ItemFileViewHolder(itemView, onStartDrag, onRemoveFile)
         }
     }
-
 }

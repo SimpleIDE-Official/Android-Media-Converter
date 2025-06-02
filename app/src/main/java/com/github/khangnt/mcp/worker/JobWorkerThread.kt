@@ -14,18 +14,18 @@ import com.github.khangnt.mcp.util.UriUtils
 import com.github.khangnt.mcp.util.catchAll
 import com.github.khangnt.mcp.util.closeQuietly
 import com.github.khangnt.mcp.util.deleteRecursiveIgnoreError
-import timber.log.Timber
 import java.io.*
+import timber.log.Timber
 
 private const val MAX_LOG_FILE_SIZE = 50 * 1024 // 50 KB
 
 class JobWorkerThread(
-        val appContext: Context,
-        var job: Job,
-        private val jobRepository: JobRepository,
-        private val onCompleteListener: (Job) -> Unit,
-        private val onErrorListener: (Job, Throwable?) -> Unit,
-        private val workingPaths: WorkingPaths = makeWorkingPaths(appContext)
+    val appContext: Context,
+    var job: Job,
+    private val jobRepository: JobRepository,
+    private val onCompleteListener: (Job) -> Unit,
+    private val onErrorListener: (Job, Throwable?) -> Unit,
+    private val workingPaths: WorkingPaths = makeWorkingPaths(appContext),
 ) : Thread() {
     companion object {
         private fun getPid(process: Process): Int? {
@@ -49,21 +49,28 @@ class JobWorkerThread(
             updateJob(status = JobStatus.RUNNING, block = true)
         }
 
-        jobTempDir = try {
-            workingPaths.getTempDirForJob(job.id)
-        } catch (error: Throwable) {
-            onError(error, "Error: ${error.message}")
-            return
-        }
+        jobTempDir =
+            try {
+                workingPaths.getTempDirForJob(job.id)
+            } catch (error: Throwable) {
+                onError(error, "Error: ${error.message}")
+                return
+            }
 
         logFile = catchAll(printLog = true) { workingPaths.getLogFileOfJob(job.id) }
 
-        val commandResolver = try {
-            CommandResolver.resolve(appContext, jobTempDir!!, workingPaths.ffmpegPath, job.command)
-        } catch (resolveCommandError: Throwable) {
-            onError(resolveCommandError, "Init failed: ${resolveCommandError.message}")
-            return
-        }
+        val commandResolver =
+            try {
+                CommandResolver.resolve(
+                    appContext,
+                    jobTempDir!!,
+                    workingPaths.ffmpegPath,
+                    job.command,
+                )
+            } catch (resolveCommandError: Throwable) {
+                onError(resolveCommandError, "Init failed: ${resolveCommandError.message}")
+                return
+            }
 
         val startTime = System.currentTimeMillis()
 
@@ -71,41 +78,44 @@ class JobWorkerThread(
         try {
             process = startProcess(commandResolver)
         } catch (securityException: SecurityException) {
-            onError(securityException, "Security error when start " +
-                    "FFmpeg process: ${securityException.message}")
+            onError(
+                securityException,
+                "Security error when start " + "FFmpeg process: ${securityException.message}",
+            )
         } catch (interruptException: InterruptedException) {
             onError(interruptException, "Job was canceled")
         } catch (startProcessError: Throwable) {
             onError(startProcessError, "Start FFmpeg failed: ${startProcessError.message}")
         }
 
-        if (process === null) return  // error happened
+        if (process === null) return // error happened
 
         val loggerThread = LoggerThread(process.errorStream)
         loggerThread.start()
 
         // wait process complete
-        val exitCode = try {
-            process.waitFor()
-        } catch (interruptException: InterruptedException) {
-            onError(interruptException, "Job was canceled")
-            // shutdown process
-            catchAll {
-                process.inputStream.closeQuietly()
-                process.outputStream.closeQuietly()
-                getPid(process)?.let { pid ->
-                    Timber.d("Kill pid: $pid")
-                    android.os.Process.killProcess(pid)
+        val exitCode =
+            try {
+                process.waitFor()
+            } catch (interruptException: InterruptedException) {
+                onError(interruptException, "Job was canceled")
+                // shutdown process
+                catchAll {
+                    process.inputStream.closeQuietly()
+                    process.outputStream.closeQuietly()
+                    getPid(process)?.let { pid ->
+                        Timber.d("Kill pid: $pid")
+                        android.os.Process.killProcess(pid)
+                    }
+                    process.destroy()
                 }
-                process.destroy()
-            }
 
-            catchAll {
-                loggerThread.interrupt()
-                loggerThread.join()
+                catchAll {
+                    loggerThread.interrupt()
+                    loggerThread.join()
+                }
+                return
             }
-            return
-        }
 
         catchAll {
             // wait logger thread complete
@@ -137,36 +147,34 @@ class JobWorkerThread(
             commandResolver.sourceOutput.closeQuietly()
         }
 
-        Timber.d("Conversion success, take %d ms, output: %s",
-                System.currentTimeMillis() - startTime, job.command.output)
+        Timber.d(
+            "Conversion success, take %d ms, output: %s",
+            System.currentTimeMillis() - startTime,
+            job.command.output,
+        )
 
         // completed
         updateJob(status = JobStatus.COMPLETED, block = true)
         isAlive
         onCompleteListener(job)
-        catchAll {
-            UriUtils.getPathFromUri(appContext, Uri.parse(commandResolver.command.output))
-        }?.let { filePath ->
-            // notify media scanner
-            MediaScannerConnection.scanFile(appContext, arrayOf(filePath),
-                    null, null)
-        }
+        catchAll { UriUtils.getPathFromUri(appContext, Uri.parse(commandResolver.command.output)) }
+            ?.let { filePath ->
+                // notify media scanner
+                MediaScannerConnection.scanFile(appContext, arrayOf(filePath), null, null)
+            }
 
         // clean up temp folder
         jobTempDir?.deleteRecursiveIgnoreError()
     }
 
     private fun startProcess(commandResolver: CommandResolver): Process {
-        val cmdArray = listOf(
-                "sh", "-c",
-                commandResolver.execCommand
-        )
+        val cmdArray = listOf("sh", "-c", commandResolver.execCommand)
         Timber.d("Start process with command: ${commandResolver.execCommand}")
         Timber.d("Final output: ${commandResolver.command.output}")
         return ProcessBuilder()
-                .apply { environment().putAll(commandResolver.command.environmentVars) }
-                .command(cmdArray)
-                .start()
+            .apply { environment().putAll(commandResolver.command.environmentVars) }
+            .command(cmdArray)
+            .start()
     }
 
     private fun onError(error: Throwable, message: String) {
@@ -181,7 +189,11 @@ class JobWorkerThread(
         reportNonFatal(error, "JobWorkerThread#onError", message)
     }
 
-    private fun updateJob(status: Int = JobStatus.RUNNING, statusDetail: String? = null, block: Boolean) {
+    private fun updateJob(
+        status: Int = JobStatus.RUNNING,
+        statusDetail: String? = null,
+        block: Boolean,
+    ) {
         job = job.copy(status = status, statusDetail = statusDetail)
         if (block) {
             jobRepository.updateJob(job, ignoreError = false).blockingAwait()
@@ -200,7 +212,6 @@ class JobWorkerThread(
 
         var lastLine: String? = null
 
-
         init {
             RunningJobStatus.postUpdate("")
         }
@@ -208,12 +219,14 @@ class JobWorkerThread(
         override fun run() {
             val logFileOutputStream: OutputStreamWriter? = catchAll {
                 logFile?.let {
-                    OutputStreamWriter(object : FileOutputStream(it) {
-                        override fun write(b: ByteArray?, off: Int, len: Int) {
-                            fileSize += len
-                            super.write(b, off, len)
+                    OutputStreamWriter(
+                        object : FileOutputStream(it) {
+                            override fun write(b: ByteArray?, off: Int, len: Int) {
+                                fileSize += len
+                                super.write(b, off, len)
+                            }
                         }
-                    })
+                    )
                 }
             }
             var converting = false
@@ -247,8 +260,8 @@ class JobWorkerThread(
                         }
 
                         if (durationSeconds !== null && durationSeconds!! > 0 && time !== null) {
-                            val percent = (parseDurationString(time!!)
-                                    ?: 0) * 100 / durationSeconds!!
+                            val percent =
+                                (parseDurationString(time!!) ?: 0) * 100 / durationSeconds!!
                             stringBuilder.append(" $percent%")
                         } else if (bitrate !== null) {
                             stringBuilder.append(" br=").append(bitrate)
@@ -269,24 +282,23 @@ class JobWorkerThread(
                 }
             }
             if (skippedLine > 0) {
-                logFileOutputStream?.appendln("[...]\n$skippedLine lines was skipped\n[...]\n$lastLine")
+                logFileOutputStream?.appendln(
+                    "[...]\n$skippedLine lines was skipped\n[...]\n$lastLine"
+                )
             }
             logFileOutputStream.closeQuietly()
             RunningJobStatus.postUpdate("")
         }
 
-        /**
-         * Parse time in format hh:mm:ss to number of seconds
-         */
+        /** Parse time in format hh:mm:ss to number of seconds */
         private fun parseDurationString(duration: String): Long? {
             val split = duration.take(8).split(":")
             if (split.size == 3) {
                 return (split[0].toLongOrNull() ?: 0) * 3600 +
-                        (split[1].toLongOrNull() ?: 0) * 60 +
-                        (split[2].toLongOrNull() ?: 0)
+                    (split[1].toLongOrNull() ?: 0) * 60 +
+                    (split[2].toLongOrNull() ?: 0)
             }
             return null
         }
     }
-
 }

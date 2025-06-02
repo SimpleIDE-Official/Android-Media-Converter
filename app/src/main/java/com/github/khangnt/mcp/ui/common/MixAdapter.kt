@@ -11,24 +11,17 @@ import com.github.khangnt.mcp.util.checkMainThread
 import java.lang.IllegalArgumentException
 import java.lang.IllegalStateException
 
-/**
- * Created by Khang NT on 3/23/18.
- * Email: khang.neon.1997@gmail.com
- */
-
+/** Created by Khang NT on 3/23/18. Email: khang.neon.1997@gmail.com */
 interface ViewHolderFactory {
     @get:LayoutRes val layoutRes: Int
+
     fun create(itemView: View): CustomViewHolder<*>
 }
 
-data class ItemType(
-        val viewType: Int,
-        val viewHolderFactory: ViewHolderFactory
-)
+data class ItemType(val viewType: Int, val viewHolderFactory: ViewHolderFactory)
 
-class MixAdapter(
-        private val mapModelClassItemType: Map<Class<out AdapterModel>, ItemType>
-) : RecyclerView.Adapter<CustomViewHolder<*>>(), ItemTouchHelperAdapter {
+class MixAdapter(private val mapModelClassItemType: Map<Class<out AdapterModel>, ItemType>) :
+    RecyclerView.Adapter<CustomViewHolder<*>>(), ItemTouchHelperAdapter {
 
     private var layoutInflater: LayoutInflater? = null
     private val itemDataList = mutableListOf<AdapterModel>()
@@ -63,7 +56,7 @@ class MixAdapter(
     override fun getItemViewType(position: Int): Int {
         val dataClass = itemDataList[position].javaClass
         return mapModelClassItemType[dataClass]?.viewType
-                ?: throw IllegalStateException("Unknown item view type for $dataClass")
+            ?: throw IllegalStateException("Unknown item view type for $dataClass")
     }
 
     override fun getItemId(position: Int): Long {
@@ -75,7 +68,8 @@ class MixAdapter(
         if (layoutInflater === null) {
             layoutInflater = LayoutInflater.from(parent.context)
         }
-        val itemType = mapViewTypeItemType.get(viewType)
+        val itemType =
+            mapViewTypeItemType.get(viewType)
                 ?: throw IllegalArgumentException("Unknown view type $viewType")
         val layoutRes = itemType.viewHolderFactory.layoutRes
         val itemView = layoutInflater!!.inflate(layoutRes, parent, false)

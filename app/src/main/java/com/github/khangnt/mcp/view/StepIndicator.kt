@@ -8,14 +8,9 @@ import android.view.View
 import com.github.khangnt.mcp.R
 import kotlin.math.ceil
 
-/**
- * Created by Khang NT on 4/6/18.
- * Email: khang.neon.1997@gmail.com
- */
-
-class StepIndicator @JvmOverloads constructor(
-        context: Context, attrs: AttributeSet? = null
-) : View(context, attrs) {
+/** Created by Khang NT on 4/6/18. Email: khang.neon.1997@gmail.com */
+class StepIndicator @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
+    View(context, attrs) {
 
     private var stepCount: Int
     private var step: Int
@@ -27,14 +22,19 @@ class StepIndicator @JvmOverloads constructor(
     private var indicatorSize: Int
     private var indicatorSpace: Int
 
-
     init {
-        val ta = context.theme.obtainStyledAttributes(attrs, R.styleable.StepIndicator,
-                0, R.style.StepIndicatorDefault)
+        val ta =
+            context.theme.obtainStyledAttributes(
+                attrs,
+                R.styleable.StepIndicator,
+                0,
+                R.style.StepIndicatorDefault,
+            )
         try {
             indicatorColor = ta.getColor(R.styleable.StepIndicator_indicator_color, 0)
             indicatorSize = ta.getDimensionPixelOffset(R.styleable.StepIndicator_indicator_size, 0)
-            indicatorSpace = ta.getDimensionPixelOffset(R.styleable.StepIndicator_indicator_space, 0)
+            indicatorSpace =
+                ta.getDimensionPixelOffset(R.styleable.StepIndicator_indicator_space, 0)
             stepCount = ta.getInt(R.styleable.StepIndicator_indicator_stepCount, 3)
             step = ta.getInt(R.styleable.StepIndicator_indicator_step, 1)
         } finally {
@@ -64,12 +64,14 @@ class StepIndicator @JvmOverloads constructor(
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val width = stepCount * indicatorSize + (stepCount - 1) * indicatorSpace +
+        val width =
+            stepCount * indicatorSize +
+                (stepCount - 1) * indicatorSpace +
                 paintStepNormal.strokeWidth
         val height = indicatorSize + paintStepNormal.strokeWidth
         setMeasuredDimension(
-                MeasureSpec.makeMeasureSpec(ceil(width).toInt(), MeasureSpec.EXACTLY),
-                MeasureSpec.makeMeasureSpec(ceil(height).toInt(), MeasureSpec.EXACTLY)
+            MeasureSpec.makeMeasureSpec(ceil(width).toInt(), MeasureSpec.EXACTLY),
+            MeasureSpec.makeMeasureSpec(ceil(height).toInt(), MeasureSpec.EXACTLY),
         )
     }
 
@@ -82,5 +84,4 @@ class StepIndicator @JvmOverloads constructor(
             x += indicatorSize + indicatorSpace
         }
     }
-
 }

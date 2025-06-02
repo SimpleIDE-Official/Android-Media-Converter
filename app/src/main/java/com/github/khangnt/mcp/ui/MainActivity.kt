@@ -27,10 +27,10 @@ import com.github.khangnt.mcp.util.viewChangelog
 import com.github.khangnt.mcp.worker.ACTION_JOB_DONE
 import com.github.khangnt.mcp.worker.EXTRA_JOB_ID
 import com.github.khangnt.mcp.worker.EXTRA_JOB_STATUS
-import kotlinx.android.synthetic.main.activity_main.*
-import timber.log.Timber
 import java.lang.IllegalArgumentException
 import java.util.concurrent.TimeUnit.*
+import kotlinx.android.synthetic.main.activity_main.*
+import timber.log.Timber
 
 private const val EXTRA_OPEN_JOB_MANAGER = "EXTRA:openJobManager"
 private const val KEY_SELECTED_FRAGMENT = "MainActivity:selectedFragment"
@@ -40,10 +40,12 @@ class MainActivity : SingleFragmentActivity(), NavigationView.OnNavigationItemSe
     companion object {
         fun openJobManagerIntent(context: Context): Intent {
             return Intent(context, MainActivity::class.java)
-                    .setFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT or
-                            Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or
-                            Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                    .putExtra(EXTRA_OPEN_JOB_MANAGER, true)
+                .setFlags(
+                    Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT or
+                        Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or
+                        Intent.FLAG_ACTIVITY_SINGLE_TOP
+                )
+                .putExtra(EXTRA_OPEN_JOB_MANAGER, true)
         }
     }
 
@@ -64,7 +66,6 @@ class MainActivity : SingleFragmentActivity(), NavigationView.OnNavigationItemSe
             viewChangelog(this)
             sharedPrefs.lastKnownVersionCode = BuildConfig.VERSION_CODE
         }
-
     }
 
     override fun onCreateFragment(savedInstanceState: Bundle?): Fragment {
@@ -72,7 +73,8 @@ class MainActivity : SingleFragmentActivity(), NavigationView.OnNavigationItemSe
             intent = intent.cloneFilter()
             return createSelectedFragment(R.id.item_nav_job_manager)
         }
-        val selectedId = savedInstanceState?.getInt(KEY_SELECTED_FRAGMENT, R.id.item_nav_job_manager)
+        val selectedId =
+            savedInstanceState?.getInt(KEY_SELECTED_FRAGMENT, R.id.item_nav_job_manager)
         return createSelectedFragment(selectedId ?: R.id.item_nav_job_manager)
     }
 
@@ -102,13 +104,21 @@ class MainActivity : SingleFragmentActivity(), NavigationView.OnNavigationItemSe
         super.setSupportActionBar(toolbar)
         toolbar?.let {
             currentDrawerListener?.let(drawerLayout::removeDrawerListener)
-            currentDrawerListener = ActionBarDrawerToggle(this, drawerLayout, it,
-                    R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+            currentDrawerListener =
+                ActionBarDrawerToggle(
+                        this,
+                        drawerLayout,
+                        it,
+                        R.string.navigation_drawer_open,
+                        R.string.navigation_drawer_close,
+                    )
                     .also { actionBarDrawerToggle ->
                         drawerLayout.addDrawerListener(actionBarDrawerToggle)
                         actionBarDrawerToggle.syncState()
-                        it.setTag(R.id.toolbar_slide_drawable,
-                                actionBarDrawerToggle.drawerArrowDrawable)
+                        it.setTag(
+                            R.id.toolbar_slide_drawable,
+                            actionBarDrawerToggle.drawerArrowDrawable,
+                        )
                     }
         }
     }
@@ -156,35 +166,40 @@ class MainActivity : SingleFragmentActivity(), NavigationView.OnNavigationItemSe
         return true
     }
 
-
     private fun showRateDialog() {
         AlertDialog.Builder(this)
-                .setTitle(R.string.rate_us_title)
-                .setMessage(R.string.rate_us_message)
-                .setPositiveButton(R.string.rate_us_love_it, { _, _ ->
+            .setTitle(R.string.rate_us_title)
+            .setMessage(R.string.rate_us_message)
+            .setPositiveButton(
+                R.string.rate_us_love_it,
+                { _, _ ->
                     openPlayStore(this, PLAY_STORE_PACKAGE)
                     getSharedPrefs().isRated = true
-                })
-                .setNeutralButton(R.string.rate_us_not_now, { _, _ ->
+                },
+            )
+            .setNeutralButton(
+                R.string.rate_us_not_now,
+                { _, _ ->
                     // don't show this dialog again, until next day
                     getSharedPrefs().delayRateDialogUntil =
-                            System.currentTimeMillis() + MILLISECONDS.convert(1, DAYS)
-                })
-                .setNegativeButton(R.string.rate_us_never, { _, _ ->
-                    getSharedPrefs().isRated = true
-                })
-                .show()
+                        System.currentTimeMillis() + MILLISECONDS.convert(1, DAYS)
+                },
+            )
+            .setNegativeButton(R.string.rate_us_never, { _, _ -> getSharedPrefs().isRated = true })
+            .show()
     }
 
     private fun onJobDone(jobId: Long, @JobStatus jobStatus: Int) {
         Timber.d("onJobDone called($jobId, $jobStatus)")
         val sharedPrefs = SingletonInstances.getSharedPrefs()
-        if (jobStatus == JobStatus.COMPLETED
-                && !sharedPrefs.isRated
-                && sharedPrefs.successJobsCount >= 3
-                && System.currentTimeMillis() >= sharedPrefs.delayRateDialogUntil) {
+        if (
+            jobStatus == JobStatus.COMPLETED &&
+                !sharedPrefs.isRated &&
+                sharedPrefs.successJobsCount >= 3 &&
+                System.currentTimeMillis() >= sharedPrefs.delayRateDialogUntil
+        ) {
             sharedPrefs.delayRateDialogUntil =
-                    System.currentTimeMillis() + MILLISECONDS.convert(1, HOURS)
+                System.currentTimeMillis() + MILLISECONDS.convert(1, HOURS)
             showRateDialog()
         }
     }

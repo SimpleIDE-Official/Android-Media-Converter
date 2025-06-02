@@ -8,11 +8,11 @@ import com.github.khangnt.mcp.annotation.JobStatus
 
 @Entity(tableName = "jobs_v2", indices = [Index("status")])
 data class Job(
-        @ColumnInfo(name = "_id") @PrimaryKey(autoGenerate = true) val id: Long = 0,
-        @ColumnInfo(name = "title") val title: String,
-        @ColumnInfo(name = "status") @JobStatus val status: Int = JobStatus.PENDING,
-        @ColumnInfo(name = "status_detail") val statusDetail: String? = null,
-        @ColumnInfo(name = "command") val command: Command
+    @ColumnInfo(name = "_id") @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @ColumnInfo(name = "title") val title: String,
+    @ColumnInfo(name = "status") @JobStatus val status: Int = JobStatus.PENDING,
+    @ColumnInfo(name = "status_detail") val statusDetail: String? = null,
+    @ColumnInfo(name = "command") val command: Command,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

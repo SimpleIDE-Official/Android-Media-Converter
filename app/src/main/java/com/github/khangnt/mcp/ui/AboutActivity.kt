@@ -43,7 +43,7 @@ class AboutActivity : BaseActivity() {
         val scrollRange by lazy {
             // decrease scrim visible height (-1/4)
             collapsingToolbar.scrimVisibleHeightTrigger =
-                    collapsingToolbar.scrimVisibleHeightTrigger * 3 / 4
+                collapsingToolbar.scrimVisibleHeightTrigger * 3 / 4
             appBarLayout.totalScrollRange
         }
 
@@ -57,32 +57,23 @@ class AboutActivity : BaseActivity() {
 
         tvAppVersion.text = getString(R.string.app_version_format, BuildConfig.VERSION_NAME)
 
-        changelog.setOnClickListener{
-            viewChangelog(this)
-        }
+        changelog.setOnClickListener { viewChangelog(this) }
 
-        rateUs.setOnClickListener {
-            openPlayStore(this, PLAY_STORE_PACKAGE)
-        }
+        rateUs.setOnClickListener { openPlayStore(this, PLAY_STORE_PACKAGE) }
 
         forkOnGithub.setOnClickListener {
             openUrl(this, GITHUB_REPO, getString(R.string.open_github))
         }
 
         licenses.setOnClickListener {
-            LicensesDialog.Builder(this)
-                    .setNotices(R.raw.licenses)
-                    .build()
-                    .show()
+            LicensesDialog.Builder(this).setNotices(R.raw.licenses).build().show()
         }
 
         privacyPolicy.setOnClickListener {
             openUrl(this, PRIVACY_POLICY_URL, getString(R.string.privacy_policy))
         }
 
-        contact.setOnClickListener {
-            sendEmail(this)
-        }
+        contact.setOnClickListener { sendEmail(this) }
 
         translate.setOnClickListener {
             openUrl(this, TRANSLATE_PAGE, getString(R.string.open_translate_page))
@@ -98,24 +89,23 @@ class AboutActivity : BaseActivity() {
             openUrl(this, GITHUB_NEW_ISSUE_URL, getString(R.string.open_github_issues))
         }
 
-        emailFeedback.setOnClickListener {
-            toggleFeedbackCard()
-        }
+        emailFeedback.setOnClickListener { toggleFeedbackCard() }
 
         btnSendFb.setOnClickListener {
             toggleFeedbackCard()
 
-            val feedBackType = when (tabLayout.selectedTabPosition) {
-                0 -> getString(R.string.feature_request)
-                1 -> getString(R.string.bug_report)
-                2 -> getString(R.string.question)
-                else -> null
-            }
+            val feedBackType =
+                when (tabLayout.selectedTabPosition) {
+                    0 -> getString(R.string.feature_request)
+                    1 -> getString(R.string.bug_report)
+                    2 -> getString(R.string.question)
+                    else -> null
+                }
 
             sendEmail(
-                    this,
-                    "$feedBackType from ${device.getModel()} Android ${device.getAndroidVersion()}",
-                    "${edFeedbackDetails.text}\n\n\n\n$device"
+                this,
+                "$feedBackType from ${device.getModel()} Android ${device.getAndroidVersion()}",
+                "${edFeedbackDetails.text}\n\n\n\n$device",
             )
         }
 
@@ -124,7 +114,6 @@ class AboutActivity : BaseActivity() {
                 scrollView.post({ scrollView.fullScroll(ScrollView.FOCUS_DOWN) })
             }
         }
-
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -158,5 +147,4 @@ class AboutActivity : BaseActivity() {
         tabLayout.getTabAt(currentTab)?.select()
         cardFeedback.visibility = savedInstanceState.getInt(KEY_CARD_FEEDBACK_VISIBILITY)
     }
-
 }

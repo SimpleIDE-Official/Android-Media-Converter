@@ -30,56 +30,63 @@ enum class Gradient(val colors: IntArray) {
     SoundCloud(colorArrayOf(0xfffe8c00, 0xfff83600)),
     Mini(colorArrayOf(0xff30e8bf, 0xffff8235)),
     EasyMed(colorArrayOf(0xffdce35b, 0xff45b649)),
-    Friday(colorArrayOf(0xff83a4d4, 0xffb6fbff))
-    ;
+    Friday(colorArrayOf(0xff83a4d4, 0xffb6fbff));
 
     fun getDrawable(
-            orientation: GradientDrawable.Orientation = GradientDrawable.Orientation.LEFT_RIGHT
+        orientation: GradientDrawable.Orientation = GradientDrawable.Orientation.LEFT_RIGHT
     ) = GradientDrawable(orientation, colors)
 }
 
 interface PresetCommand {
     fun getTag(): String
+
     fun getTitle(resources: Resources): String
+
     fun createCommandBuilderFragment(): CommandBuilderFragment
 }
 
 enum class ConvertCommand(
-        @ConvertType val type: Int, @StringRes val shortName: Int, val gradient: Gradient,
-        val fragmentFactory: () -> CommandBuilderFragment
-
-): PresetCommand {
+    @ConvertType val type: Int,
+    @StringRes val shortName: Int,
+    val gradient: Gradient,
+    val fragmentFactory: () -> CommandBuilderFragment,
+) : PresetCommand {
     CONVERT_MP3(
-            type = ConvertType.TYPE_ENCODE_AUDIO, shortName = R.string.short_name_mp3,
-            gradient = Gradient.SublimeLight,
-            fragmentFactory = ::Mp3CmdBuilderFragment
+        type = ConvertType.TYPE_ENCODE_AUDIO,
+        shortName = R.string.short_name_mp3,
+        gradient = Gradient.SublimeLight,
+        fragmentFactory = ::Mp3CmdBuilderFragment,
     ),
     CONVERT_AAC(
-            type = ConvertType.TYPE_ENCODE_AUDIO, shortName = R.string.short_name_aac,
-            gradient = Gradient.Quepal,
-            fragmentFactory = ::AacCmdBuilderFragment
+        type = ConvertType.TYPE_ENCODE_AUDIO,
+        shortName = R.string.short_name_aac,
+        gradient = Gradient.Quepal,
+        fragmentFactory = ::AacCmdBuilderFragment,
     ),
     CONVERT_FLAC(
-            type = ConvertType.TYPE_ENCODE_AUDIO, shortName = R.string.short_name_flac,
-            gradient = Gradient.DigitalWater,
-            fragmentFactory = ::FlacCmdBuilderFragment
+        type = ConvertType.TYPE_ENCODE_AUDIO,
+        shortName = R.string.short_name_flac,
+        gradient = Gradient.DigitalWater,
+        fragmentFactory = ::FlacCmdBuilderFragment,
     ),
     CONVERT_OPUS(
-            type = ConvertType.TYPE_ENCODE_AUDIO, shortName = R.string.short_name_opus,
-            gradient = Gradient.EasyMed,
-            fragmentFactory = ::OpusCmdBuilderFragment
+        type = ConvertType.TYPE_ENCODE_AUDIO,
+        shortName = R.string.short_name_opus,
+        gradient = Gradient.EasyMed,
+        fragmentFactory = ::OpusCmdBuilderFragment,
     ),
     CONVERT_OGG(
-            type = ConvertType.TYPE_ENCODE_AUDIO, shortName = R.string.short_name_ogg,
-            gradient = Gradient.Friday,
-            fragmentFactory = ::OggCmdBuilderFragment
+        type = ConvertType.TYPE_ENCODE_AUDIO,
+        shortName = R.string.short_name_ogg,
+        gradient = Gradient.Friday,
+        fragmentFactory = ::OggCmdBuilderFragment,
     ),
     CONVERT_MP4(
-            type = ConvertType.TYPE_ENCODE_VIDEO, shortName = R.string.short_name_mp4,
-            gradient = Gradient.Nighthawk,
-            fragmentFactory = ::Mp4CmdBuilderFragment
-    ),
-    ;
+        type = ConvertType.TYPE_ENCODE_VIDEO,
+        shortName = R.string.short_name_mp4,
+        gradient = Gradient.Nighthawk,
+        fragmentFactory = ::Mp4CmdBuilderFragment,
+    );
 
     override fun createCommandBuilderFragment(): CommandBuilderFragment = fragmentFactory()
 
@@ -88,45 +95,55 @@ enum class ConvertCommand(
     }
 
     override fun getTag(): String = name
-
 }
 
 enum class EditCommand(
-        @StringRes val label: Int, @DrawableRes val iconRes: Int, val gradient: Gradient,
-        @IntRange(from = 1) val minInputCount: Int,
-        @IntRange(from = 1) val maxInputCount: Int,
-        val fragmentFactory: () -> CommandBuilderFragment
-
-): PresetCommand {
+    @StringRes val label: Int,
+    @DrawableRes val iconRes: Int,
+    val gradient: Gradient,
+    @IntRange(from = 1) val minInputCount: Int,
+    @IntRange(from = 1) val maxInputCount: Int,
+    val fragmentFactory: () -> CommandBuilderFragment,
+) : PresetCommand {
     CUT_LENGTH(
-            label = R.string.label_cut_length, iconRes = R.drawable.ic_content_cut_black_24dp,
-            gradient = Gradient.Piglet,
-            minInputCount = 1, maxInputCount = 1,
-            fragmentFactory = ::Mp3CmdBuilderFragment
+        label = R.string.label_cut_length,
+        iconRes = R.drawable.ic_content_cut_black_24dp,
+        gradient = Gradient.Piglet,
+        minInputCount = 1,
+        maxInputCount = 1,
+        fragmentFactory = ::Mp3CmdBuilderFragment,
     ),
     MERGE_VIDEO(
-            label = R.string.label_merge_video, iconRes = R.drawable.ic_library_video_black_24dp,
-            gradient = Gradient.KokoCaramel,
-            minInputCount = 2, maxInputCount = 10,
-            fragmentFactory = ::Mp3CmdBuilderFragment
+        label = R.string.label_merge_video,
+        iconRes = R.drawable.ic_library_video_black_24dp,
+        gradient = Gradient.KokoCaramel,
+        minInputCount = 2,
+        maxInputCount = 10,
+        fragmentFactory = ::Mp3CmdBuilderFragment,
     ),
     MERGE_AUDIO(
-            label = R.string.label_merge_audio, iconRes = R.drawable.ic_library_music_black_24dp,
-            gradient = Gradient.Turquoiseflow,
-            minInputCount = 2, maxInputCount = 10,
-            fragmentFactory = ::Mp3CmdBuilderFragment
+        label = R.string.label_merge_audio,
+        iconRes = R.drawable.ic_library_music_black_24dp,
+        gradient = Gradient.Turquoiseflow,
+        minInputCount = 2,
+        maxInputCount = 10,
+        fragmentFactory = ::Mp3CmdBuilderFragment,
     ),
     RESIZE_VIDEO(
-            label = R.string.label_resize_video, iconRes = R.drawable.ic_aspect_ratio_black_24dp,
-            gradient = Gradient.SoundCloud,
-            minInputCount = 1, maxInputCount = 1,
-            fragmentFactory = ::Mp3CmdBuilderFragment
+        label = R.string.label_resize_video,
+        iconRes = R.drawable.ic_aspect_ratio_black_24dp,
+        gradient = Gradient.SoundCloud,
+        minInputCount = 1,
+        maxInputCount = 1,
+        fragmentFactory = ::Mp3CmdBuilderFragment,
     ),
     VIDEO_SPEED(
-            label = R.string.label_video_speed, iconRes = R.drawable.ic_slow_motion_video_black_24dp,
-            gradient = Gradient.Mini,
-            minInputCount = 1, maxInputCount = 1,
-            fragmentFactory = ::Mp3CmdBuilderFragment
+        label = R.string.label_video_speed,
+        iconRes = R.drawable.ic_slow_motion_video_black_24dp,
+        gradient = Gradient.Mini,
+        minInputCount = 1,
+        maxInputCount = 1,
+        fragmentFactory = ::Mp3CmdBuilderFragment,
     );
 
     override fun createCommandBuilderFragment(): CommandBuilderFragment = fragmentFactory()
@@ -135,4 +152,3 @@ enum class EditCommand(
 
     override fun getTag(): String = name
 }
-

@@ -20,17 +20,16 @@ import com.github.khangnt.mcp.util.invisible
 import com.github.khangnt.mcp.util.visible
 import kotlinx.android.synthetic.main.fragment_job_maker.*
 
-
 class JobMakerFragment : BaseFragment() {
 
-    /** Get shared view model via host activity **/
+    /** Get shared view model via host activity * */
     private val jobMakerViewModel by lazy { requireActivity().getViewModel<JobMakerViewModel>() }
     private var nSelectedFiles = 0
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View? = inflater.inflate(R.layout.fragment_job_maker, container, false)
 
     @SuppressLint("SetTextI18n")
@@ -62,12 +61,10 @@ class JobMakerFragment : BaseFragment() {
         ivNext.setOnClickListener {
             jobMakerViewModel.requestVisible()
             (childFragmentManager.findFragmentById(R.id.fragmentContainer) as? StepFragment)
-                    ?.onGoToNextStep()
+                ?.onGoToNextStep()
             preventButtonClickToFast()
         }
-        peakArea.setOnClickListener {
-            jobMakerViewModel.requestVisible()
-        }
+        peakArea.setOnClickListener { jobMakerViewModel.requestVisible() }
     }
 
     private fun preventButtonClickToFast() {
@@ -78,8 +75,8 @@ class JobMakerFragment : BaseFragment() {
     }
 
     private fun showNumberSelectedFileTitle() {
-        tvTitle.text = resources.getQuantityString(R.plurals.num_selected_file,
-                nSelectedFiles, nSelectedFiles)
+        tvTitle.text =
+            resources.getQuantityString(R.plurals.num_selected_file, nSelectedFiles, nSelectedFiles)
     }
 
     @SuppressLint("SetTextI18n")
@@ -149,5 +146,4 @@ class JobMakerFragment : BaseFragment() {
             commit()
         }
     }
-
 }

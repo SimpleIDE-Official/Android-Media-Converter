@@ -5,12 +5,7 @@ import android.widget.TextView
 import com.github.khangnt.mcp.R
 import kotlinx.android.synthetic.main.item_header.view.*
 
-/**
- * Created by Khang NT on 1/5/18.
- * Email: khang.neon.1997@gmail.com
- */
-
-
+/** Created by Khang NT on 1/5/18. Email: khang.neon.1997@gmail.com */
 class HeaderModel(val header: String) : AdapterModel, HasIdLong {
     override val idLong: Long by lazy { IdGenerator.idFor(header) }
 }
@@ -29,5 +24,4 @@ class ItemHeaderViewHolder(itemView: View) : CustomViewHolder<HeaderModel>(itemV
             return ItemHeaderViewHolder(itemView)
         }
     }
-
 }

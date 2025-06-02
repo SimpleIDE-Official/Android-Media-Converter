@@ -13,9 +13,10 @@ import com.github.khangnt.mcp.getKnownReasonOf
 import com.github.khangnt.mcp.ui.common.Status
 import kotlinx.android.synthetic.main.view_recyclerview_container.view.*
 
-class RecyclerViewContainer @JvmOverloads constructor(
-        context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : CoordinatorLayout(context, attrs, defStyleAttr) {
+class RecyclerViewContainer
+@JvmOverloads
+constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
+    CoordinatorLayout(context, attrs, defStyleAttr) {
 
     lateinit var onRefreshListener: (() -> Boolean)
 
@@ -34,38 +35,54 @@ class RecyclerViewContainer @JvmOverloads constructor(
     }
 
     init {
-        LayoutInflater.from(context).inflate(
-                R.layout.view_recyclerview_container, this, true)
+        LayoutInflater.from(context).inflate(R.layout.view_recyclerview_container, this, true)
         if (attrs != null) {
-            val ta = context.theme.obtainStyledAttributes(attrs, R.styleable.RecyclerViewContainer,
-                    defStyleAttr, 0)
+            val ta =
+                context.theme.obtainStyledAttributes(
+                    attrs,
+                    R.styleable.RecyclerViewContainer,
+                    defStyleAttr,
+                    0,
+                )
             try {
-                val rvPaddingVertical = ta.getDimensionPixelOffset(
-                        R.styleable.RecyclerViewContainer_rv_paddingVertical, 0)
-                val rvPaddingHorizontal = ta.getDimensionPixelOffset(
-                        R.styleable.RecyclerViewContainer_rv_paddingHorizontal, 0)
-                val rvClipToPadding = ta.getBoolean(
-                        R.styleable.RecyclerViewContainer_rv_clipToPadding, false)
-                recyclerView.setPadding(rvPaddingHorizontal, rvPaddingVertical, rvPaddingHorizontal,
-                        rvPaddingVertical)
+                val rvPaddingVertical =
+                    ta.getDimensionPixelOffset(
+                        R.styleable.RecyclerViewContainer_rv_paddingVertical,
+                        0,
+                    )
+                val rvPaddingHorizontal =
+                    ta.getDimensionPixelOffset(
+                        R.styleable.RecyclerViewContainer_rv_paddingHorizontal,
+                        0,
+                    )
+                val rvClipToPadding =
+                    ta.getBoolean(R.styleable.RecyclerViewContainer_rv_clipToPadding, false)
+                recyclerView.setPadding(
+                    rvPaddingHorizontal,
+                    rvPaddingVertical,
+                    rvPaddingHorizontal,
+                    rvPaddingVertical,
+                )
                 recyclerView.clipToPadding = rvClipToPadding
 
-                showReloadOnEmpty = ta.getBoolean(R.styleable.RecyclerViewContainer_rv_showReloadOnEmpty,
-                        true)
+                showReloadOnEmpty =
+                    ta.getBoolean(R.styleable.RecyclerViewContainer_rv_showReloadOnEmpty, true)
                 loadingText = ta.getText(R.styleable.RecyclerViewContainer_rv_loadingText)
                 emptyText = ta.getText(R.styleable.RecyclerViewContainer_rv_emptyText)
             } finally {
                 ta.recycle()
             }
         }
-        swipeRefreshLayout.setColorSchemeResources(R.color.red, R.color.green,
-                R.color.yellow, R.color.blue)
+        swipeRefreshLayout.setColorSchemeResources(
+            R.color.red,
+            R.color.green,
+            R.color.yellow,
+            R.color.blue,
+        )
         swipeRefreshLayout.setOnRefreshListener {
             if (!onRefreshListener.invoke()) setRefreshing(false)
         }
-        reloadButton.setOnClickListener {
-            if (onRefreshListener.invoke()) setRefreshing(true)
-        }
+        reloadButton.setOnClickListener { if (onRefreshListener.invoke()) setRefreshing(true) }
     }
 
     fun setSwipeRefreshEnabled(enabled: Boolean) {
@@ -97,8 +114,8 @@ class RecyclerViewContainer @JvmOverloads constructor(
                 reloadButton.visibility = View.GONE
             }
             is Status.Error -> {
-                val errorMessage = getKnownReasonOf(status.throwable, context,
-                        "${status.throwable.message}")
+                val errorMessage =
+                    getKnownReasonOf(status.throwable, context, "${status.throwable.message}")
                 setRefreshing(false)
                 messageTv.text = errorMessage
                 reloadButton.visibility = View.VISIBLE
@@ -120,8 +137,7 @@ class RecyclerViewContainer @JvmOverloads constructor(
 
     fun promptRefresh(message: String, onReloadClick: () -> Unit) {
         Snackbar.make(this, message, Snackbar.LENGTH_LONG)
-                .setAction(R.string.reload, { onReloadClick() })
-                .show()
+            .setAction(R.string.reload, { onReloadClick() })
+            .show()
     }
-
 }

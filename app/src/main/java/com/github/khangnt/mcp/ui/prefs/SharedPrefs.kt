@@ -54,33 +54,22 @@ class SharedPrefs(private val mContext: Context) {
     }
 
     private fun putBoolean(@StringRes keyRes: Int, value: Boolean) {
-        mPrefs.edit()
-                .putBoolean(mContext.getString(keyRes), value)
-                .apply()
+        mPrefs.edit().putBoolean(mContext.getString(keyRes), value).apply()
     }
 
     private fun putInt(@StringRes keyRes: Int, value: Int) {
-        mPrefs.edit()
-                .putInt(mContext.getString(keyRes), value)
-                .apply()
+        mPrefs.edit().putInt(mContext.getString(keyRes), value).apply()
     }
 
     private fun putLong(@StringRes keyRes: Int, value: Long) {
-        mPrefs.edit()
-                .putLong(mContext.getString(keyRes), value)
-                .apply()
+        mPrefs.edit().putLong(mContext.getString(keyRes), value).apply()
     }
 
     private fun putString(@StringRes keyRes: Int, value: String?) {
-        mPrefs.edit()
-                .putString(mContext.getString(keyRes), value)
-                .apply()
+        mPrefs.edit().putString(mContext.getString(keyRes), value).apply()
     }
 
     private fun putStringSet(@StringRes keyRes: Int, value: Set<String>) {
-        mPrefs.edit()
-                .putStringSet(mContext.getString(keyRes), value)
-                .apply()
+        mPrefs.edit().putStringSet(mContext.getString(keyRes), value).apply()
     }
-
 }

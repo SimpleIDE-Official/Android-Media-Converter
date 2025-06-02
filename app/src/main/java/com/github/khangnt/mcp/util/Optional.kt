@@ -1,10 +1,6 @@
 package com.github.khangnt.mcp.util
 
-/**
- * Created by Khang NT on 1/3/18.
- * Email: khang.neon.1997@gmail.com
- */
-
+/** Created by Khang NT on 1/3/18. Email: khang.neon.1997@gmail.com */
 data class Optional<out T>(val value: T?) {
     companion object {
         private val NULL = Optional(null)

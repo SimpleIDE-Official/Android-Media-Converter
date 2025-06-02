@@ -15,15 +15,10 @@ import android.view.ViewTreeObserver
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 
-
-/**
- * Created by Khang NT on 1/5/18.
- * Email: khang.neon.1997@gmail.com
- */
-
+/** Created by Khang NT on 1/5/18. Email: khang.neon.1997@gmail.com */
 fun isRtl(context: Context): Boolean {
     return Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN &&
-            context.resources.configuration.layoutDirection == ViewCompat.LAYOUT_DIRECTION_RTL
+        context.resources.configuration.layoutDirection == ViewCompat.LAYOUT_DIRECTION_RTL
 }
 
 fun TextView.onTextSizeChanged(listener: (length: Int) -> Unit): TextWatcher {
@@ -37,24 +32,19 @@ fun TextView.onTextSizeChanged(listener: (length: Int) -> Unit): TextWatcher {
 }
 
 fun TextView.onTextChanged(listener: (text: CharSequence) -> Unit): TextWatcher {
-    val textWatcher: TextWatcher = object : TextWatcher {
-        override fun afterTextChanged(s: Editable) {
-            listener(text)
+    val textWatcher: TextWatcher =
+        object : TextWatcher {
+            override fun afterTextChanged(s: Editable) {
+                listener(text)
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         }
-
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-        }
-
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
-        }
-    }
     addTextChangedListener(textWatcher)
     return textWatcher
 }
-
-
 
 private fun showToast(context: Context, message: String?, duration: Int = Toast.LENGTH_SHORT) {
     Toast.makeText(context, message ?: "null", duration).show()
@@ -76,7 +66,6 @@ fun Fragment.toast(message: String?, duration: Int = Toast.LENGTH_SHORT) {
     showToast(context!!, message, duration)
 }
 
-
 fun View.visible() {
     visibility = VISIBLE
 }
@@ -90,25 +79,33 @@ fun View.gone() {
 }
 
 fun SeekBar.onSeekBarChanged(callback: (progress: Int) -> Unit) {
-    setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-        override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-            callback(progress)
+    setOnSeekBarChangeListener(
+        object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                callback(progress)
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) = Unit
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) = Unit
         }
-
-        override fun onStartTrackingTouch(seekBar: SeekBar?) = Unit
-
-        override fun onStopTrackingTouch(seekBar: SeekBar?) = Unit
-    })
+    )
 }
 
 fun Spinner.onItemSelected(callback: (position: Int) -> Unit) {
-    onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-        override fun onNothingSelected(parent: AdapterView<*>?) = Unit
+    onItemSelectedListener =
+        object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(parent: AdapterView<*>?) = Unit
 
-        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-            callback(position)
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long,
+            ) {
+                callback(position)
+            }
         }
-    }
 }
 
 var TextInputLayout.errorMessage: String?
@@ -124,11 +121,14 @@ var TextInputLayout.errorMessage: String?
     }
 
 fun EditText.openKeyboard(delay: Long = 200) {
-    postDelayed({
-        this.requestFocus()
-        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
-    }, delay)
+    postDelayed(
+        {
+            this.requestFocus()
+            val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
+        },
+        delay,
+    )
 }
 
 fun getSpanCount(minWidth: Int, columnSpace: Int = 0): Int {
@@ -141,13 +141,15 @@ fun getSpanCount(minWidth: Int, columnSpace: Int = 0): Int {
 }
 
 fun View.doOnPreDraw(action: () -> Unit) {
-    viewTreeObserver.addOnPreDrawListener(object: ViewTreeObserver.OnPreDrawListener {
-        override fun onPreDraw(): Boolean {
-            action()
-            viewTreeObserver.removeOnPreDrawListener(this)
-            return true
+    viewTreeObserver.addOnPreDrawListener(
+        object : ViewTreeObserver.OnPreDrawListener {
+            override fun onPreDraw(): Boolean {
+                action()
+                viewTreeObserver.removeOnPreDrawListener(this)
+                return true
+            }
         }
-    })
+    )
 }
 
 fun View.disableInHalfSecond() {

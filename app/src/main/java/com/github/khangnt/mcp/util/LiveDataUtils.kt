@@ -6,19 +6,19 @@ import android.arch.lifecycle.Observer
 import android.support.annotation.MainThread
 
 //
-//class DistinctLiveData<T> : MediatorLiveData<T>() {
+// class DistinctLiveData<T> : MediatorLiveData<T>() {
 //    override fun setValue(value: T) {
 //        if (value != super.getValue()) {
 //            super.setValue(value)
 //        }
 //    }
-//}
+// }
 //
-//fun <T> LiveData<T>.distinct(): DistinctLiveData<T> {
+// fun <T> LiveData<T>.distinct(): DistinctLiveData<T> {
 //    val distinctLiveData = DistinctLiveData<T>()
 //    distinctLiveData.addSource(this, { if (it != null) distinctLiveData.setValue(it) })
 //    return distinctLiveData
-//}
+// }
 //
 //
 
@@ -54,7 +54,7 @@ class LiveEvent : LiveData<Any>() {
 
 //
 //
-//class DebounceLiveData<T>(private val delayMs: Long) : MediatorLiveData<T>() {
+// class DebounceLiveData<T>(private val delayMs: Long) : MediatorLiveData<T>() {
 //    companion object {
 //        private const val MSG_SET_VALUE = 0
 //    }
@@ -82,7 +82,6 @@ class LiveEvent : LiveData<Any>() {
 //        setValue(value)
 //    }
 //
-//}
+// }
 //
-//fun
-
+// fun

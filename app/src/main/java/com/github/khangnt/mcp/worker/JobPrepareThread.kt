@@ -13,27 +13,28 @@ import com.liulishuo.filedownloader.BaseDownloadTask
 import com.liulishuo.filedownloader.FileDownloadSampleListener
 import com.liulishuo.filedownloader.FileDownloader
 import com.liulishuo.filedownloader.model.FileDownloadStatus
-import timber.log.Timber
 import java.io.BufferedOutputStream
 import java.io.File
 import java.lang.Exception
+import timber.log.Timber
 
 private const val DOWNLOAD_TASK_UPDATE_INTERVAL = 500
 
 /**
- * Some inputs with scheme http://, https://, content:// can't be handled
- * by FFmpeg internally (only support file and pipe protocol). These inputs need to copy to temp folder
- * and will be deleted after job completed.
+ * Some inputs with scheme http://, https://, content:// can't be handled by FFmpeg internally (only
+ * support file and pipe protocol). These inputs need to copy to temp folder and will be deleted
+ * after job completed.
  *
- * JobPrepareThread was created to download/copy inputs to temp folder, where ffmpeg can read directly.
+ * JobPrepareThread was created to download/copy inputs to temp folder, where ffmpeg can read
+ * directly.
  */
 class JobPrepareThread(
-        val appContext: Context,
-        var job: Job,
-        private val jobRepository: JobRepository,
-        private val onCompleteListener: (Job) -> Unit,
-        private val onErrorListener: (Job, Throwable?) -> Unit,
-        private val workingPaths: WorkingPaths = makeWorkingPaths(appContext)
+    val appContext: Context,
+    var job: Job,
+    private val jobRepository: JobRepository,
+    private val onCompleteListener: (Job) -> Unit,
+    private val onErrorListener: (Job, Throwable?) -> Unit,
+    private val workingPaths: WorkingPaths = makeWorkingPaths(appContext),
 ) : Thread() {
     private var jobTempDir: File? = null
 
@@ -41,12 +42,13 @@ class JobPrepareThread(
         // start preparing
         Timber.d("Start preparing job: ${job.title}")
 
-        jobTempDir = try {
-            workingPaths.getTempDirForJob(job.id)
-        } catch (error: Throwable) {
-            onError(error, "Error: ${error.message}")
-            return
-        }
+        jobTempDir =
+            try {
+                workingPaths.getTempDirForJob(job.id)
+            } catch (error: Throwable) {
+                onError(error, "Error: ${error.message}")
+                return
+            }
 
         val contentResolver = appContext.contentResolver
 
@@ -61,7 +63,8 @@ class JobPrepareThread(
                     updateJob(statusDetail = "Copying input $index", block = true)
                     try {
                         contentResolver.openInputStream(inputUri).use { inputStream ->
-                            val outputStream = contentResolver.openOutputStream(Uri.fromFile(inputCopyTo))
+                            val outputStream =
+                                contentResolver.openOutputStream(Uri.fromFile(inputCopyTo))
                             BufferedOutputStream(outputStream).use { bufferedOutputStream ->
                                 inputStream.copyTo(bufferedOutputStream)
                             }
@@ -71,24 +74,36 @@ class JobPrepareThread(
                         return
                     }
                 }
-                "http", "https" -> { // ffmpeg not compiled to support http/https protocol
+                "http",
+                "https" -> { // ffmpeg not compiled to support http/https protocol
                     val inputDownloadTo = makeInputTempFile(jobTempDir!!, index).absolutePath
                     Timber.d("Download input $index to $inputDownloadTo")
                     updateJob(statusDetail = "Downloading input $index", block = true)
-                    val downloadTask = FileDownloader.getImpl().create(input)
+                    val downloadTask =
+                        FileDownloader.getImpl()
+                            .create(input)
                             .setForceReDownload(true)
                             .setPath(inputDownloadTo)
                             .setCallbackProgressMinInterval(DOWNLOAD_TASK_UPDATE_INTERVAL)
                             .setSyncCallback(true)
-                            .setListener(object : FileDownloadSampleListener() {
-                                override fun progress(task: BaseDownloadTask, soFarBytes: Int, totalBytes: Int) {
-                                    val speed = task.speed
-                                    val percent = if (totalBytes > 0) (soFarBytes * 100 / totalBytes) else -1
-                                    val percentString = if (percent > 0) "$percent%" else ""
-                                    val status = "Downloading input $index\n${speed}KB/s $percentString"
-                                    updateJob(statusDetail = status, block = false)
+                            .setListener(
+                                object : FileDownloadSampleListener() {
+                                    override fun progress(
+                                        task: BaseDownloadTask,
+                                        soFarBytes: Int,
+                                        totalBytes: Int,
+                                    ) {
+                                        val speed = task.speed
+                                        val percent =
+                                            if (totalBytes > 0) (soFarBytes * 100 / totalBytes)
+                                            else -1
+                                        val percentString = if (percent > 0) "$percent%" else ""
+                                        val status =
+                                            "Downloading input $index\n${speed}KB/s $percentString"
+                                        updateJob(statusDetail = status, block = false)
+                                    }
                                 }
-                            })
+                            )
                     downloadTask.start()
 
                     while (true) {
@@ -101,7 +116,8 @@ class JobPrepareThread(
                         }
                         if (FileDownloadStatus.isOver(downloadTask.status.toInt())) {
                             if (downloadTask.status == FileDownloadStatus.error) {
-                                val error = downloadTask.errorCause
+                                val error =
+                                    downloadTask.errorCause
                                         ?: Exception("Download input $index failed")
                                 onError(error, "Download input $index failed: ${error.message}")
                                 return
@@ -127,7 +143,11 @@ class JobPrepareThread(
         onCompleteListener(job)
     }
 
-    private fun updateJob(status: Int = JobStatus.PREPARING, statusDetail: String? = null, block: Boolean) {
+    private fun updateJob(
+        status: Int = JobStatus.PREPARING,
+        statusDetail: String? = null,
+        block: Boolean,
+    ) {
         job = job.copy(status = status, statusDetail = statusDetail)
         if (block) {
             jobRepository.updateJob(job, ignoreError = false).blockingAwait()

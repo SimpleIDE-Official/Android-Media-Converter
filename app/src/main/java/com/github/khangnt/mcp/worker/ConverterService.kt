@@ -26,9 +26,8 @@ import com.github.khangnt.mcp.util.toJsonOrNull
 import com.github.khangnt.mcp.util.toMapString
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
-
+import timber.log.Timber
 
 private const val NOTIFICATION_UPDATE_INTERVAL = 500L
 private const val SERVICE_WAKE_LOCK_TAG = "converterService:wakeLock"
@@ -44,10 +43,8 @@ const val EXTRA_JOB_CMD_OUTPUT_FMT = "ConverterService:JobCmdOutputFmt"
 const val EXTRA_JOB_CMD_ARGS = "ConverterService:JobCmdOutputArgs"
 const val EXTRA_JOB_CMD_ENV_VARS_JSON = "ConverterService:JobCmdOutputEnvVars"
 
-
 private const val ACTION_START_FOREGROUND = "${BuildConfig.APPLICATION_ID}.action.startForeground"
 private const val ACTION_STOP_FOREGROUND = "${BuildConfig.APPLICATION_ID}.action.stopForeground"
-
 
 private fun Bundle.toJob(): Job? {
     val title: String = getString(EXTRA_JOB_TITLE, "Untitled")
@@ -58,39 +55,44 @@ private fun Bundle.toJob(): Job? {
     val environmentVarsJsonString: String = getString(EXTRA_JOB_CMD_ENV_VARS_JSON) ?: "{}"
     val environmentVarsJson = environmentVarsJsonString.toJsonOrNull()
     // validate
-    if (inputUris.isEmpty() ||
+    if (
+        inputUris.isEmpty() ||
             inputUris.any { it.isBlank() } ||
             outputUri.isBlank() ||
             outputFormat.isBlank() ||
-            environmentVarsJson === null) {
+            environmentVarsJson === null
+    ) {
         Timber.d("Invalid Job in bundle: ${this}")
         return null
     }
     return Job(
-            id = 0,
-            title = title,
-            status = JobStatus.PENDING,
-            statusDetail = null,
-            command = Command(
-                    inputs = inputUris,
-                    output = outputUri,
-                    outputFormat = outputFormat,
-                    args = args,
-                    environmentVars = environmentVarsJson.toMapString()
-            )
+        id = 0,
+        title = title,
+        status = JobStatus.PENDING,
+        statusDetail = null,
+        command =
+            Command(
+                inputs = inputUris,
+                output = outputUri,
+                outputFormat = outputFormat,
+                args = args,
+                environmentVars = environmentVarsJson.toMapString(),
+            ),
     )
 }
 
 class ConverterService : Service() {
     companion object {
         fun startForeground(appContext: Context) {
-            appContext.startService(Intent(appContext, ConverterService::class.java)
-                    .setAction(ACTION_START_FOREGROUND))
+            appContext.startService(
+                Intent(appContext, ConverterService::class.java).setAction(ACTION_START_FOREGROUND)
+            )
         }
 
         fun stopForeground(appContext: Context) {
-            appContext.startService(Intent(appContext, ConverterService::class.java)
-                    .setAction(ACTION_STOP_FOREGROUND))
+            appContext.startService(
+                Intent(appContext, ConverterService::class.java).setAction(ACTION_STOP_FOREGROUND)
+            )
         }
     }
 
@@ -115,16 +117,17 @@ class ConverterService : Service() {
         notificationBuilder = notificationHelper.createConverterNotification()
 
         // Show running status in notification
-        notificationUpdateDisposable = RunningJobStatus.observeRunningJobStatus()
+        notificationUpdateDisposable =
+            RunningJobStatus.observeRunningJobStatus()
                 .distinctUntilChanged()
                 .throttleLast(NOTIFICATION_UPDATE_INTERVAL, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::updateNotificationIfNeeded, Timber::d)
 
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
-        serviceWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, SERVICE_WAKE_LOCK_TAG)
+        serviceWakeLock =
+            powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, SERVICE_WAKE_LOCK_TAG)
     }
-
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         goToForeground(force = true)
@@ -137,20 +140,26 @@ class ConverterService : Service() {
             ACTION_START_FOREGROUND -> Unit // already on foreground
             ACTION_STOP_FOREGROUND -> stopForeground()
 
-        /****************************** CALLED BY EXTERNAL APP ******************************/
+            /** **************************** CALLED BY EXTERNAL APP ***************************** */
             ACTION_ADD_JOB -> {
                 if (!hasWriteStoragePermission(this)) {
                     if (!hasWriteStoragePermission(this)) {
                         // don't add job without write external storage permission granted
-                        val pendingIntent = PendingIntent.getService(this,
-                                pendingAddJobIntentCode++, intent.cloneFilter().putExtras(intent),
-                                PendingIntent.FLAG_ONE_SHOT)
-                        startActivity(Intent(this, PermissionTransparentActivity::class.java)
+                        val pendingIntent =
+                            PendingIntent.getService(
+                                this,
+                                pendingAddJobIntentCode++,
+                                intent.cloneFilter().putExtras(intent),
+                                PendingIntent.FLAG_ONE_SHOT,
+                            )
+                        startActivity(
+                            Intent(this, PermissionTransparentActivity::class.java)
                                 .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                .putExtra(EXTRA_PENDING_INTENT, pendingIntent))
+                                .putExtra(EXTRA_PENDING_INTENT, pendingIntent)
+                        )
                     } else {
                         intent.extras?.toJob()?.let { jobWorkerManager.addJob(it) }
-                                ?: jobWorkerManager.maybeLaunchWorker()
+                            ?: jobWorkerManager.maybeLaunchWorker()
                     }
                 }
             }
@@ -179,7 +188,7 @@ class ConverterService : Service() {
             // only show notification in foreground
             if (outputSize.isNotBlank()) {
                 notificationBuilder.setContentText(
-                        getString(R.string.converter_service_running_with_speed, outputSize)
+                    getString(R.string.converter_service_running_with_speed, outputSize)
                 )
             } else {
                 notificationBuilder.setContentText(getString(R.string.converter_service_running))
@@ -210,5 +219,4 @@ class ConverterService : Service() {
             serviceWakeLock.release()
         }
     }
-
 }

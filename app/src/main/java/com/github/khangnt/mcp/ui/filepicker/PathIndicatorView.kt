@@ -7,31 +7,28 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import com.github.khangnt.mcp.ui.common.MixAdapter
-import timber.log.Timber
 import java.io.File
+import timber.log.Timber
 
-/**
- * Created by Khang NT on 2/2/18.
- * Email: khang.neon.1997@gmail.com
- */
-
-class PathIndicatorView @JvmOverloads constructor(
-        context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : RecyclerView(context, attrs, defStyleAttr) {
+/** Created by Khang NT on 2/2/18. Email: khang.neon.1997@gmail.com */
+class PathIndicatorView
+@JvmOverloads
+constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
+    RecyclerView(context, attrs, defStyleAttr) {
 
     lateinit var onPathClick: (PathIndicatorView, File) -> Unit
 
     private var currentPath: File? = null
 
-    private val pathIndicatorAdapter: MixAdapter = MixAdapter.Builder {
-        withModel<PathIndicatorModel> {
-            PathIndicatorViewHolder.Factory {
-                onClick = {
-                    onPathClick.invoke(this@PathIndicatorView, it.path)
+    private val pathIndicatorAdapter: MixAdapter =
+        MixAdapter.Builder {
+                withModel<PathIndicatorModel> {
+                    PathIndicatorViewHolder.Factory {
+                        onClick = { onPathClick.invoke(this@PathIndicatorView, it.path) }
+                    }
                 }
             }
-        }
-    }.build()
+            .build()
 
     init {
         super.setAdapter(pathIndicatorAdapter)
@@ -79,5 +76,4 @@ class PathIndicatorView @JvmOverloads constructor(
             state.getString("path")?.let { setPath(File(it)) }
         }
     }
-
 }

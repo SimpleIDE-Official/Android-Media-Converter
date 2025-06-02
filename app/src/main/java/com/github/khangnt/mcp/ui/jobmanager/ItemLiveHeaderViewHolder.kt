@@ -11,15 +11,9 @@ import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.item_header.view.*
 import timber.log.Timber
 
-/**
- * Created by Khang NT on 1/5/18.
- * Email: khang.neon.1997@gmail.com
- */
-
-data class LiveHeaderModel(
-        val headerFormat: String,
-        val liveTextObservable: Observable<String>
-) : AdapterModel, HasIdLong {
+/** Created by Khang NT on 1/5/18. Email: khang.neon.1997@gmail.com */
+data class LiveHeaderModel(val headerFormat: String, val liveTextObservable: Observable<String>) :
+    AdapterModel, HasIdLong {
     override val idLong: Long by lazy { IdGenerator.idFor(headerFormat) }
 }
 
@@ -30,22 +24,22 @@ class ItemLiveHeaderViewHolder(itemView: View) : CustomViewHolder<LiveHeaderMode
 
     override fun bind(model: LiveHeaderModel, pos: Int) {
         disposable?.dispose()
-        disposable = model.liveTextObservable
+        disposable =
+            model.liveTextObservable
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    tvHeader.text = String.format(model.headerFormat, it)
-                }, {
-                    Timber.d(it)
-                    tvHeader.text = ""
-                })
+                .subscribe(
+                    { tvHeader.text = String.format(model.headerFormat, it) },
+                    {
+                        Timber.d(it)
+                        tvHeader.text = ""
+                    },
+                )
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         disposable?.dispose()
     }
-
-
 
     class Factory : ViewHolderFactory {
         override val layoutRes: Int = R.layout.item_header

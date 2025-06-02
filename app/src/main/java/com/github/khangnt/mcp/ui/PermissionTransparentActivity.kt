@@ -12,11 +12,7 @@ import com.github.khangnt.mcp.util.catchAll
 import com.github.khangnt.mcp.util.hasWriteStoragePermission
 import com.github.khangnt.mcp.util.toast
 
-/**
- * Created by Khang NT on 1/7/18.
- * Email: khang.neon.1997@gmail.com
- */
-
+/** Created by Khang NT on 1/7/18. Email: khang.neon.1997@gmail.com */
 const val EXTRA_PENDING_INTENT = "PermissionTransparentActivity.PendingIntent"
 const val EXTRA_DENIED_MESSAGE = "PermissionTransparentActivity.DeniedMessage"
 
@@ -46,10 +42,17 @@ class PermissionTransparentActivity : BaseActivity() {
         requestPermissions(arrayOf(WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE), RC)
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray,
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (grantResults.any { it != PERMISSION_GRANTED }) {
-            toast(permissionDeniedMess ?: getString(R.string.permission_not_granted), Toast.LENGTH_LONG)
+            toast(
+                permissionDeniedMess ?: getString(R.string.permission_not_granted),
+                Toast.LENGTH_LONG,
+            )
         } else {
             catchAll { pendingIntent?.send() }
         }

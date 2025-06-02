@@ -13,26 +13,21 @@ import com.github.khangnt.mcp.ui.prefs.SharedPrefs
 import com.github.khangnt.mcp.util.ExternalStorage
 import com.github.khangnt.mcp.util.catchAll
 import com.github.khangnt.mcp.worker.JobWorkerManager
+import java.io.File
+import java.util.concurrent.TimeUnit
+import kotlin.concurrent.thread
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level.HEADERS
 import timber.log.Timber
-import java.io.File
-import java.util.concurrent.TimeUnit
-import kotlin.concurrent.thread
 
-/**
- * Created by Khang NT on 1/2/18.
- * Email: khang.neon.1997@gmail.com
- */
-
+/** Created by Khang NT on 1/2/18. Email: khang.neon.1997@gmail.com */
 class SingletonInstances private constructor(private val appContext: Context) {
     companion object {
-        private const val CACHE_SIZE = 20 * 1024 * 1024L     //20MB
+        private const val CACHE_SIZE = 20 * 1024 * 1024L // 20MB
 
-        @SuppressLint("StaticFieldLeak")
-        private lateinit var INSTANCE: SingletonInstances
+        @SuppressLint("StaticFieldLeak") private lateinit var INSTANCE: SingletonInstances
         private var initialized = false
 
         fun init(context: Context) {
@@ -58,28 +53,27 @@ class SingletonInstances private constructor(private val appContext: Context) {
         fun getSdCardPath(): File? = INSTANCE.sdCardPath
     }
 
-    private val mainCacheLazy by lazy {
-        Cache(File(appContext.cacheDir, "main_cache"), CACHE_SIZE)
-    }
+    private val mainCacheLazy by lazy { Cache(File(appContext.cacheDir, "main_cache"), CACHE_SIZE) }
 
     private val okHttpClientLazy by lazy {
         OkHttpClient.Builder()
-                .retryOnConnectionFailure(true)
-                .followRedirects(true)
-                .followSslRedirects(true)
-                .cache(mainCacheLazy)
-                .connectTimeout(DEFAULT_CONNECTION_TIMEOUT.toLong(), TimeUnit.MILLISECONDS)
-                .readTimeout(DEFAULT_IO_TIMEOUT.toLong(), TimeUnit.MILLISECONDS)
-                .writeTimeout(DEFAULT_IO_TIMEOUT.toLong(), TimeUnit.MILLISECONDS)
-                .apply {
-                    if (BuildConfig.DEBUG) {
-                        addInterceptor(HttpLoggingInterceptor({ Timber.d(it) }).setLevel(HEADERS))
-                    }
+            .retryOnConnectionFailure(true)
+            .followRedirects(true)
+            .followSslRedirects(true)
+            .cache(mainCacheLazy)
+            .connectTimeout(DEFAULT_CONNECTION_TIMEOUT.toLong(), TimeUnit.MILLISECONDS)
+            .readTimeout(DEFAULT_IO_TIMEOUT.toLong(), TimeUnit.MILLISECONDS)
+            .writeTimeout(DEFAULT_IO_TIMEOUT.toLong(), TimeUnit.MILLISECONDS)
+            .apply {
+                if (BuildConfig.DEBUG) {
+                    addInterceptor(HttpLoggingInterceptor({ Timber.d(it) }).setLevel(HEADERS))
                 }
-                .build()
+            }
+            .build()
     }
 
-    private val mainDatabase = Room.databaseBuilder(appContext, MainDatabase::class.java, DB_NAME)
+    private val mainDatabase =
+        Room.databaseBuilder(appContext, MainDatabase::class.java, DB_NAME)
             .apply { if (!BuildConfig.DEBUG) fallbackToDestructiveMigration() }
             .addMigrations(Migration1To2())
             .build()
@@ -90,8 +84,9 @@ class SingletonInstances private constructor(private val appContext: Context) {
 
     private val viewModelFactory = ViewModelFactory(appContext)
 
-    private val jobWorkerManagerLazy: JobWorkerManager
-            by lazy { JobWorkerManager(appContext, jobRepositoryLazy, sharedPrefsLazy) }
+    private val jobWorkerManagerLazy: JobWorkerManager by lazy {
+        JobWorkerManager(appContext, jobRepositoryLazy, sharedPrefsLazy)
+    }
 
     private val sdCardPath by lazy {
         catchAll { ExternalStorage.getAllStorageLocations() }?.get(ExternalStorage.EXTERNAL_SD_CARD)
@@ -103,5 +98,4 @@ class SingletonInstances private constructor(private val appContext: Context) {
             Timber.d("SD card path: %s", sdCardPath)
         }
     }
-
 }

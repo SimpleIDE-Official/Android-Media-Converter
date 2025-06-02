@@ -13,12 +13,8 @@ import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import timber.log.Timber
 
-/**
- * Created by Khang NT on 1/2/18.
- * Email: khang.neon.1997@gmail.com
- */
-
-class MainApplication: Application() {
+/** Created by Khang NT on 1/2/18. Email: khang.neon.1997@gmail.com */
+class MainApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
@@ -35,18 +31,18 @@ class MainApplication: Application() {
         SingletonInstances.init(this)
 
         FileDownloader.setupOnApplicationOnCreate(this)
-                .database { NoDatabaseImpl() }
-                .maxNetworkThreadCount(4)
-                .commit()
+            .database { NoDatabaseImpl() }
+            .maxNetworkThreadCount(4)
+            .commit()
 
         Fabric.with(this, Crashlytics())
 
         CaocConfig.Builder.create()
-                .backgroundMode(CaocConfig.BACKGROUND_MODE_SILENT)
-                .showErrorDetails(true)
-                .showRestartButton(true)
-                .trackActivities(true)
-                .apply()
+            .backgroundMode(CaocConfig.BACKGROUND_MODE_SILENT)
+            .showErrorDetails(true)
+            .showRestartButton(true)
+            .trackActivities(true)
+            .apply()
 
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
@@ -59,17 +55,21 @@ class MainApplication: Application() {
 
     private fun setupStrictMode() {
         if (BuildConfig.DEBUG) {
-            StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder()
+            StrictMode.setThreadPolicy(
+                StrictMode.ThreadPolicy.Builder()
                     .detectAll()
                     .penaltyFlashScreen()
                     .penaltyLog()
-                    .build())
-            StrictMode.setVmPolicy(StrictMode.VmPolicy.Builder()
+                    .build()
+            )
+            StrictMode.setVmPolicy(
+                StrictMode.VmPolicy.Builder()
                     .detectLeakedSqlLiteObjects()
                     .detectLeakedClosableObjects()
                     .detectActivityLeaks()
                     .penaltyLog()
-                    .build())
+                    .build()
+            )
         } else {
             // on release, don't detect any thing
             StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder().build())

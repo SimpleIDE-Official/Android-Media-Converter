@@ -6,17 +6,13 @@ import com.github.khangnt.mcp.util.copy
 import java.io.InputStream
 import java.io.OutputStream
 
-/**
- * Created by Khang NT on 1/1/18.
- * Email: khang.neon.1997@gmail.com
- */
-
+/** Created by Khang NT on 1/1/18. Email: khang.neon.1997@gmail.com */
 class CopierThread(
-        private val sourceInput: SourceInputStream,
-        private val sourceOutput: SourceOutputStream,
-        private val bufferLength: Int = DEFAULT_IO_BUFFER_LENGTH,
-        private val onError: (Throwable) -> Unit,
-        private val onSuccess: () -> Unit = {}
+    private val sourceInput: SourceInputStream,
+    private val sourceOutput: SourceOutputStream,
+    private val bufferLength: Int = DEFAULT_IO_BUFFER_LENGTH,
+    private val onError: (Throwable) -> Unit,
+    private val onSuccess: () -> Unit = {},
 ) : Thread() {
 
     override fun run() {
@@ -37,5 +33,4 @@ class CopierThread(
             sourceOutput.closeQuietly()
         }
     }
-
 }

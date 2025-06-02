@@ -15,8 +15,9 @@ class JobMakerViewModel : ViewModel() {
         const val STEP_SELECT_FILES = 1
         const val STEP_CHOOSE_COMMAND = 2
         const val STEP_CONFIGURE_COMMAND = 3
-        const val STEP_CHOOSE_OUTPUT_FOLDER_AND_REVIEW = 4 // select folder and resolve file name conflict
-        const val STEP_ADVERTISEMENT = 5  // show native ad at last
+        const val STEP_CHOOSE_OUTPUT_FOLDER_AND_REVIEW =
+            4 // select folder and resolve file name conflict
+        const val STEP_ADVERTISEMENT = 5 // show native ad at last
     }
 
     private val currentStepLiveData = MutableLiveData<Int>()
@@ -90,5 +91,4 @@ class JobMakerViewModel : ViewModel() {
     }
 
     fun onRequestVisible(): LiveEvent = requestVisibleLiveEvent
-
 }

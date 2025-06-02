@@ -16,19 +16,18 @@ import com.github.khangnt.mcp.util.deleteRecursiveIgnoreError
 import io.reactivex.Completable
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
-import timber.log.Timber
 import java.io.File
 import java.util.concurrent.Executors
-
+import timber.log.Timber
 
 const val ACTION_JOB_DONE = "${BuildConfig.APPLICATION_ID}.action.jobDone"
 const val EXTRA_JOB_STATUS = "ConverterService:JobStatus"
 const val EXTRA_JOB_OUTPUT = "ConverterService:JobOutput"
 
 class JobWorkerManager(
-        private val appContext: Context,
-        private val jobRepository: JobRepository,
-        private val sharedPreferences: SharedPrefs
+    private val appContext: Context,
+    private val jobRepository: JobRepository,
+    private val sharedPreferences: SharedPrefs,
 ) {
 
     private val scheduler: Scheduler
@@ -47,9 +46,7 @@ class JobWorkerManager(
         Completable.fromAction(action).subscribeOn(scheduler).subscribe()
     }
 
-    /**
-     * Notify when job FAILED or COMPLETED
-     */
+    /** Notify when job FAILED or COMPLETED */
     private fun onJobDone(job: Job) {
         if (job.status == JobStatus.COMPLETED) {
             sharedPreferences.successJobsCount += 1
@@ -82,8 +79,15 @@ class JobWorkerManager(
             if (pendingJob != null) {
                 val prepareJob = pendingJob.copy(status = JobStatus.PREPARING)
                 jobRepository.updateJob(prepareJob, false).subscribe()
-                prepareThread = JobPrepareThread(appContext, prepareJob, jobRepository,
-                        this::onJobPrepared, this::onJobFailed, workingPaths)
+                prepareThread =
+                    JobPrepareThread(
+                        appContext,
+                        prepareJob,
+                        jobRepository,
+                        this::onJobPrepared,
+                        this::onJobFailed,
+                        workingPaths,
+                    )
                 prepareThread?.start()
             }
         }
@@ -92,8 +96,15 @@ class JobWorkerManager(
             if (readyJob != null) {
                 val runJob = readyJob.copy(status = JobStatus.RUNNING)
                 jobRepository.updateJob(runJob, false).subscribe()
-                workerThread = JobWorkerThread(appContext, runJob, jobRepository,
-                        this::onJobCompleted, this::onJobFailed, workingPaths)
+                workerThread =
+                    JobWorkerThread(
+                        appContext,
+                        runJob,
+                        jobRepository,
+                        this::onJobCompleted,
+                        this::onJobFailed,
+                        workingPaths,
+                    )
                 workerThread?.start()
             }
         }
@@ -103,7 +114,9 @@ class JobWorkerManager(
         } else {
             ConverterService.stopForeground(appContext)
             // clean up temp files
-            catchAll { workingPaths.getListJobTempDir().forEach { it.deleteRecursiveIgnoreError() } }
+            catchAll {
+                workingPaths.getListJobTempDir().forEach { it.deleteRecursiveIgnoreError() }
+            }
         }
     }
 
@@ -146,9 +159,11 @@ class JobWorkerManager(
             if (scheme == "content") {
                 catchAll {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                        appContext.contentResolver.takePersistableUriPermission(this,
-                                Intent.FLAG_GRANT_READ_URI_PERMISSION or
-                                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                        appContext.contentResolver.takePersistableUriPermission(
+                            this,
+                            Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                                Intent.FLAG_GRANT_WRITE_URI_PERMISSION,
+                        )
                     }
                 }
             }
@@ -176,5 +191,4 @@ class JobWorkerManager(
     }
 
     private fun Thread?.isRunning(): Boolean = this != null && isAlive && !isInterrupted
-
 }

@@ -15,20 +15,18 @@ import com.github.khangnt.mcp.ui.jobmaker.JobMakerViewModel.Companion.STEP_CHOOS
 import com.github.khangnt.mcp.util.catchAll
 import com.github.khangnt.mcp.util.doOnPreDraw
 import com.github.khangnt.mcp.util.toast
-import kotlinx.android.synthetic.main.activity_job_maker.*
 import java.io.File
+import kotlinx.android.synthetic.main.activity_job_maker.*
 
-/**
- * Created by Khang NT on 4/5/18.
- * Email: khang.neon.1997@gmail.com
- */
-
+/** Created by Khang NT on 4/5/18. Email: khang.neon.1997@gmail.com */
 class JobMakerActivity : BaseActivity(), FileBrowserFragment.Callbacks {
 
     private val TIME_INTERVAL = 2000
     private var mBackPressed: Long = 0
 
-    private val bottomSheetBehavior by lazy { catchAll { BottomSheetBehavior.from(bottomSheetArea) } }
+    private val bottomSheetBehavior by lazy {
+        catchAll { BottomSheetBehavior.from(bottomSheetArea) }
+    }
     private val fileBrowserFragment by lazy {
         supportFragmentManager.findFragmentById(R.id.fileBrowserContainer) as FileBrowserFragment
     }
@@ -44,12 +42,16 @@ class JobMakerActivity : BaseActivity(), FileBrowserFragment.Callbacks {
         supportActionBar?.setHomeButtonEnabled(true)
 
         if (savedInstanceState == null) {
-            val fileBrowser = FileBrowserFragment.newInstance(getExternalStorageDirectory(),
-                    limitSelectCount = Int.MAX_VALUE)
-            supportFragmentManager.beginTransaction()
-                    .replace(R.id.fileBrowserContainer, fileBrowser)
-                    .replace(R.id.configurationContainer, JobMakerFragment())
-                    .commit()
+            val fileBrowser =
+                FileBrowserFragment.newInstance(
+                    getExternalStorageDirectory(),
+                    limitSelectCount = Int.MAX_VALUE,
+                )
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.fileBrowserContainer, fileBrowser)
+                .replace(R.id.configurationContainer, JobMakerFragment())
+                .commit()
         }
 
         pathIndicatorView.onPathClick = { _, path -> fileBrowserFragment.goto(path) }
@@ -63,9 +65,7 @@ class JobMakerActivity : BaseActivity(), FileBrowserFragment.Callbacks {
             }
         }
 
-        jobMakerViewModel.onResetEvent().observe {
-            fileBrowserFragment.reset()
-        }
+        jobMakerViewModel.onResetEvent().observe { fileBrowserFragment.reset() }
 
         jobMakerViewModel.onRequestVisible().observe {
             // expand bottom sheet to show job maker fragment
@@ -95,8 +95,8 @@ class JobMakerActivity : BaseActivity(), FileBrowserFragment.Callbacks {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.activity_file_picker, menu)
         val isKitkat = Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT
-        menu.findItem(R.id.item_goto_sd_card).isVisible = !isKitkat
-                && SingletonInstances.getSdCardPath() != null
+        menu.findItem(R.id.item_goto_sd_card).isVisible =
+            !isKitkat && SingletonInstances.getSdCardPath() != null
         return true
     }
 
@@ -150,5 +150,4 @@ class JobMakerActivity : BaseActivity(), FileBrowserFragment.Callbacks {
 
         return true
     }
-
 }

@@ -6,12 +6,8 @@ import android.view.View
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 
-/**
- * Created by Khang NT on 1/30/18.
- * Email: khang.neon.1997@gmail.com
- */
-
-open class RxFragment: Fragment() {
+/** Created by Khang NT on 1/30/18. Email: khang.neon.1997@gmail.com */
+open class RxFragment : Fragment() {
     private var disposableOnPaused: CompositeDisposable = CompositeDisposable()
     private var disposableOnDestroyed: CompositeDisposable = CompositeDisposable()
     private var disposableOnViewDestroyed: CompositeDisposable = CompositeDisposable()

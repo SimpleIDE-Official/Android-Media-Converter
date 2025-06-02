@@ -7,29 +7,22 @@ import android.text.TextUtils
 import android.view.View
 import com.github.khangnt.mcp.R
 import com.github.khangnt.mcp.ui.common.*
-import kotlinx.android.synthetic.main.item_file_list.view.*
 import java.io.File
+import kotlinx.android.synthetic.main.item_file_list.view.*
 
-/**
- * Created by Khang NT on 1/29/18.
- * Email: khang.neon.1997@gmail.com
- */
-
+/** Created by Khang NT on 1/29/18. Email: khang.neon.1997@gmail.com */
 const val TYPE_FOLDER = 0
 const val TYPE_FILE = 1
 const val TYPE_CREATE_FOLDER = 2
 
-data class FileListModel(
-        val path: File,
-        val type: Int,
-        var selected: Boolean = false
-) : AdapterModel, HasIdLong {
+data class FileListModel(val path: File, val type: Int, var selected: Boolean = false) :
+    AdapterModel, HasIdLong {
     override val idLong: Long by lazy { IdGenerator.idFor(path.toString()) }
 }
 
 class FileListViewHolder(
-        itemView: View,
-        onClickListener: (model: FileListModel, pos: Int) -> Unit
+    itemView: View,
+    onClickListener: (model: FileListModel, pos: Int) -> Unit,
 ) : CustomViewHolder<FileListModel>(itemView) {
     private val ivFileIcon = itemView.ivFileIcon
     private val tvFileName = itemView.tvFileName
@@ -73,27 +66,32 @@ class FileListViewHolder(
         if (selected != this.selected) {
             this.selected = selected
             tvFileName.isSelected = selected
-            val drawable: Drawable? = if (selected) {
-                tvFileName.ellipsize = TextUtils.TruncateAt.MARQUEE
-                ContextCompat.getDrawable(itemView.context, R.drawable.ic_tick_green_24dp)
-            } else {
-                tvFileName.ellipsize = TextUtils.TruncateAt.MIDDLE
-                null
-            }
+            val drawable: Drawable? =
+                if (selected) {
+                    tvFileName.ellipsize = TextUtils.TruncateAt.MARQUEE
+                    ContextCompat.getDrawable(itemView.context, R.drawable.ic_tick_green_24dp)
+                } else {
+                    tvFileName.ellipsize = TextUtils.TruncateAt.MIDDLE
+                    null
+                }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                tvFileName.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null,
-                        drawable, null)
+                tvFileName.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                    null,
+                    null,
+                    drawable,
+                    null,
+                )
             } else {
-                tvFileName.setCompoundDrawablesWithIntrinsicBounds(null, null,
-                        drawable, null)
+                tvFileName.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null)
             }
         }
     }
 
-    class Factory(init: Factory.() -> Unit): ViewHolderFactory {
+    class Factory(init: Factory.() -> Unit) : ViewHolderFactory {
         override val layoutRes: Int = R.layout.item_file_list
         lateinit var onClickListener: (model: FileListModel, pos: Int) -> Unit
+
         init {
             init()
         }

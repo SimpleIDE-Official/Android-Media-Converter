@@ -20,62 +20,67 @@ class InputDialogFragment : DialogFragment() {
 
     interface Callbacks {
         fun onInputEntered(dialog: InputDialogFragment, finalInput: String)
+
         fun onInputCancelled(dialog: InputDialogFragment)
     }
 
     var checkInputCallback: CheckInputCallback? = null
 
     // configuration
-    private val enableError by lazy {
-        arguments?.getBoolean(ARG_ENABLE_ERROR, false) ?: false
-    }
+    private val enableError by lazy { arguments?.getBoolean(ARG_ENABLE_ERROR, false) ?: false }
     private val hint by lazy { arguments?.getString(ARG_HINT) ?: "Input" }
     private val title by lazy { arguments?.getString(ARG_TITLE) }
     private val positiveButText by lazy {
         arguments?.getString(ARG_POSITIVE_BUTTON) ?: getString(R.string.action_ok)
     }
     private val negativeButText by lazy { arguments?.getString(ARG_NEGATIVE_BUTTON) }
-    private val cancelable by lazy {
-        arguments?.getBoolean(ARG_CANCELABLE, true) ?: true
-    }
-    private val maxLines by lazy {
-        arguments?.getInt(ARG_MAX_LINES, 1) ?: 1
-    }
+    private val cancelable by lazy { arguments?.getBoolean(ARG_CANCELABLE, true) ?: true }
+    private val maxLines by lazy { arguments?.getInt(ARG_MAX_LINES, 1) ?: 1 }
 
-    private val textInputLayout by lazy { dialog.findViewById<TextInputLayout>(R.id.textInputLayout) }
+    private val textInputLayout by lazy {
+        dialog.findViewById<TextInputLayout>(R.id.textInputLayout)
+    }
     private val textInputEditText by lazy { dialog.findViewById<TextInputEditText>(R.id.editText) }
 
     private lateinit var inputText: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        inputText = savedInstanceState?.getString(INPUT_TEXT, "")
-                ?: arguments?.getString(ARG_INIT_VALUE) ?: ""
-        checkInputCallback = (activity as? CheckInputCallback)
-                ?: (parentFragment as? CheckInputCallback)
+        inputText =
+            savedInstanceState?.getString(INPUT_TEXT, "")
+                ?: arguments?.getString(ARG_INIT_VALUE)
+                ?: ""
+        checkInputCallback =
+            (activity as? CheckInputCallback) ?: (parentFragment as? CheckInputCallback)
     }
 
     private fun getCallbacks(): Callbacks {
-        return (activity as? Callbacks) ?: (parentFragment as? Callbacks)
+        return (activity as? Callbacks)
+            ?: (parentFragment as? Callbacks)
             ?: throw IllegalStateException(
-                "Parent activity/fragment must implement InputDialogFragment.Callbacks")
+                "Parent activity/fragment must implement InputDialogFragment.Callbacks"
+            )
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        return AlertDialog.Builder(requireContext()).apply {
-            if (title != null) setTitle(title)
-            setCancelable(cancelable)
-            setPositiveButton(positiveButText) { _, _ ->
-                getCallbacks().onInputEntered(this@InputDialogFragment,
-                        textInputEditText.text.toString())
-            }
-            if (negativeButText != null || cancelable) {
-                setNegativeButton(negativeButText ?: getString(R.string.action_cancel)) { dialog, _ ->
-                    dialog.cancel()
+        return AlertDialog.Builder(requireContext())
+            .apply {
+                if (title != null) setTitle(title)
+                setCancelable(cancelable)
+                setPositiveButton(positiveButText) { _, _ ->
+                    getCallbacks()
+                        .onInputEntered(this@InputDialogFragment, textInputEditText.text.toString())
                 }
+                if (negativeButText != null || cancelable) {
+                    setNegativeButton(negativeButText ?: getString(R.string.action_cancel)) {
+                        dialog,
+                        _ ->
+                        dialog.cancel()
+                    }
+                }
+                setView(R.layout.dialog_input)
             }
-            setView(R.layout.dialog_input)
-        }.show()
+            .show()
     }
 
     @SuppressLint("RestrictedApi")
@@ -128,21 +133,21 @@ class InputDialogFragment : DialogFragment() {
 
         fun setNegativeBut(text: String) = apply { bundle.putString(ARG_NEGATIVE_BUTTON, text) }
 
-        fun setCancelable(cancelable: Boolean) = apply { bundle.putBoolean(ARG_CANCELABLE, cancelable) }
+        fun setCancelable(cancelable: Boolean) = apply {
+            bundle.putBoolean(ARG_CANCELABLE, cancelable)
+        }
 
         fun setMaxLines(maxLines: Int) = apply { bundle.putInt(ARG_MAX_LINES, maxLines) }
 
         fun setExtra(key: String, value: Any) = apply {
-            when(value) {
+            when (value) {
                 is Int -> bundle.putInt(key, value)
                 is String -> bundle.putString(key, value)
                 else -> RuntimeException("Add type ${value.javaClass} here")
             }
         }
 
-        fun build() = InputDialogFragment().apply {
-            arguments = Bundle().apply { putAll(bundle) }
-        }
+        fun build() = InputDialogFragment().apply { arguments = Bundle().apply { putAll(bundle) } }
     }
 
     companion object {

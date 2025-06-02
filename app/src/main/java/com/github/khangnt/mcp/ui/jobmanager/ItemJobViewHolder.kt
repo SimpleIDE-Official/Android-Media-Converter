@@ -31,16 +31,11 @@ import com.github.khangnt.mcp.util.UriUtils
 import com.github.khangnt.mcp.util.catchAll
 import com.github.khangnt.mcp.util.toast
 import com.github.khangnt.mcp.worker.makeWorkingPaths
-import kotlinx.android.synthetic.main.item_job.view.*
 import java.io.File
 import java.net.URLConnection
+import kotlinx.android.synthetic.main.item_job.view.*
 
-
-/**
- * Created by Khang NT on 1/5/18.
- * Email: khang.neon.1997@gmail.com
- */
-
+/** Created by Khang NT on 1/5/18. Email: khang.neon.1997@gmail.com */
 data class JobModel(val job: Job) : AdapterModel, HasIdLong {
     override val idLong: Long = job.id
 }
@@ -76,6 +71,7 @@ class ItemJobViewHolder(itemView: View) : CustomViewHolder<JobModel>(itemView) {
 
     class Factory : ViewHolderFactory {
         override val layoutRes: Int = R.layout.item_job
+
         override fun create(itemView: View): CustomViewHolder<*> = ItemJobViewHolder(itemView)
     }
 
@@ -96,9 +92,7 @@ class ItemJobViewHolder(itemView: View) : CustomViewHolder<JobModel>(itemView) {
     private var currentJob: Job? = null
 
     init {
-        ivDeleteJob.setOnClickListener {
-            cancelJob(context, currentJob!!, false)
-        }
+        ivDeleteJob.setOnClickListener { cancelJob(context, currentJob!!, false) }
         ivLogs.setOnClickListener {
             // open JobLogsActivity
             JobLogsActivity.launch(it.context, currentJob!!.id, currentJob!!.title)
@@ -109,13 +103,16 @@ class ItemJobViewHolder(itemView: View) : CustomViewHolder<JobModel>(itemView) {
                 // try to convert it to file scheme
                 getPath(currentJob!!)?.let { outputUri = Uri.fromFile(File(it)) }
             }
-            val intent = Intent(Intent.ACTION_SEND)
+            val intent =
+                Intent(Intent.ACTION_SEND)
                     .setType("text/plain")
                     .putExtra(Intent.EXTRA_STREAM, outputUri)
                     .putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.share_file_subject))
             grantWritePermission(outputUri, intent)
             if (disabledFileExposedStrictMode) {
-                context.startActivity(Intent.createChooser(intent, context.getString(R.string.share_chooser)))
+                context.startActivity(
+                    Intent.createChooser(intent, context.getString(R.string.share_chooser))
+                )
             }
         }
         ivOpen.setOnClickListener {
@@ -125,19 +122,21 @@ class ItemJobViewHolder(itemView: View) : CustomViewHolder<JobModel>(itemView) {
                 getPath(currentJob!!)?.let { outputUri = Uri.fromFile(File(it)) }
             }
 
-            val mimeType = catchAll {
-                URLConnection.guessContentTypeFromName(outputUri.toString())
-            } ?: MimeTypeMap.getSingleton()
-                    .getMimeTypeFromExtension(currentJob!!.command.outputFormat)
+            val mimeType =
+                catchAll { URLConnection.guessContentTypeFromName(outputUri.toString()) }
+                    ?: MimeTypeMap.getSingleton()
+                        .getMimeTypeFromExtension(currentJob!!.command.outputFormat)
 
-            val intent = Intent(Intent.ACTION_VIEW)
+            val intent =
+                Intent(Intent.ACTION_VIEW)
                     .setDataAndType(outputUri, mimeType)
                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             grantWritePermission(outputUri, intent)
 
             if (disabledFileExposedStrictMode) {
-                context.startActivity(Intent.createChooser(intent,
-                        context.getString(R.string.open_file_chooser)))
+                context.startActivity(
+                    Intent.createChooser(intent, context.getString(R.string.open_file_chooser))
+                )
             }
         }
         ivOpenFolder.setOnClickListener {
@@ -147,20 +146,24 @@ class ItemJobViewHolder(itemView: View) : CustomViewHolder<JobModel>(itemView) {
             } else {
                 val folder = File(path).parentFile
                 // this intent should work with ES Explorer
-                val intent = Intent(Intent.ACTION_VIEW)
+                val intent =
+                    Intent(Intent.ACTION_VIEW)
                         .setDataAndType(Uri.fromFile(folder), "resource/folder")
                         .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 if (disabledFileExposedStrictMode) {
                     try {
                         context.startActivity(intent)
                         return@setOnClickListener
-                    } catch (ignore: ActivityNotFoundException) {
-                    }
+                    } catch (ignore: ActivityNotFoundException) {}
 
                     // otherwise, use mime type "*/*"
                     intent.setDataAndType(Uri.fromFile(folder), "*/*")
-                    context.startActivity(Intent.createChooser(intent,
-                            context.getString(R.string.open_folder_chooser, folder.absolutePath)))
+                    context.startActivity(
+                        Intent.createChooser(
+                            intent,
+                            context.getString(R.string.open_folder_chooser, folder.absolutePath),
+                        )
+                    )
                 }
             }
         }
@@ -168,23 +171,28 @@ class ItemJobViewHolder(itemView: View) : CustomViewHolder<JobModel>(itemView) {
             val job = currentJob!!
             val path = getPath(job) ?: ""
             AlertDialog.Builder(context)
-                    .setTitle(R.string.dialog_confirm_delete_job_output)
-                    .setMessage(context.getString(R.string.dialog_confirm_delete_job_output_mess, path))
-                    .setPositiveButton(R.string.action_yes, { _, _ ->
-                        cancelJob(context, job, true)
-                    })
-                    .setNegativeButton(R.string.action_cancel, null)
-                    .show()
+                .setTitle(R.string.dialog_confirm_delete_job_output)
+                .setMessage(context.getString(R.string.dialog_confirm_delete_job_output_mess, path))
+                .setPositiveButton(R.string.action_yes, { _, _ -> cancelJob(context, job, true) })
+                .setNegativeButton(R.string.action_cancel, null)
+                .show()
         }
     }
 
     private fun grantWritePermission(outputUri: Uri, intent: Intent) {
         if (outputUri.scheme == ContentResolver.SCHEME_CONTENT) {
             catchAll {
-                val resInfoList = context.packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
+                val resInfoList =
+                    context.packageManager.queryIntentActivities(
+                        intent,
+                        PackageManager.MATCH_DEFAULT_ONLY,
+                    )
                 for (resInfo in resInfoList) {
-                    context.grantUriPermission(resInfo.activityInfo.packageName,
-                            outputUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    context.grantUriPermission(
+                        resInfo.activityInfo.packageName,
+                        outputUri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION,
+                    )
                 }
             }
         }
@@ -206,15 +214,20 @@ class ItemJobViewHolder(itemView: View) : CustomViewHolder<JobModel>(itemView) {
         currentJob = model.job
         model.job.apply {
             tvOutputFormat.text = getOutputFormatAlias(command.outputFormat)
-            ViewCompat.setBackgroundTintList(tvOutputFormat, ColorStateList.valueOf(
+            ViewCompat.setBackgroundTintList(
+                tvOutputFormat,
+                ColorStateList.valueOf(
                     when (status) {
-                        RUNNING, PREPARING -> ContextCompat.getColor(context, R.color.teal_500)
-                        PENDING, READY -> ContextCompat.getColor(context, R.color.blue_grey_500)
+                        RUNNING,
+                        PREPARING -> ContextCompat.getColor(context, R.color.teal_500)
+                        PENDING,
+                        READY -> ContextCompat.getColor(context, R.color.blue_grey_500)
                         COMPLETED -> ContextCompat.getColor(context, R.color.green_600)
                         FAILED -> ContextCompat.getColor(context, R.color.red_500)
                         else -> ContextCompat.getColor(context, R.color.red_500)
                     }
-            ))
+                ),
+            )
 
             tvJobTitle.text = title
 
@@ -226,21 +239,25 @@ class ItemJobViewHolder(itemView: View) : CustomViewHolder<JobModel>(itemView) {
             tvJobStatus.text = statusBuilder.toString()
 
             val path = getPath(this)
-            tvJobLocation.text = context.getString(R.string.job_output_location,
-                    path ?: command.output)
+            tvJobLocation.text =
+                context.getString(R.string.job_output_location, path ?: command.output)
 
-            buttonLayout.visibility = if (status == JobStatus.COMPLETED) {
-                View.VISIBLE
-            } else {
-                View.GONE
-            }
-            ivLogs.visibility = if (status == JobStatus.COMPLETED
-                    || status == JobStatus.RUNNING
-                    || status == JobStatus.FAILED) {
-                View.VISIBLE
-            } else {
-                View.GONE
-            }
+            buttonLayout.visibility =
+                if (status == JobStatus.COMPLETED) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
+            ivLogs.visibility =
+                if (
+                    status == JobStatus.COMPLETED ||
+                        status == JobStatus.RUNNING ||
+                        status == JobStatus.FAILED
+                ) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
         }
     }
 
@@ -266,9 +283,7 @@ class ItemJobViewHolder(itemView: View) : CustomViewHolder<JobModel>(itemView) {
             }
         }
         // delete log file if exits
-        catchAll {
-            makeWorkingPaths(context).getLogFileOfJob(job.id).delete()
-        }
+        catchAll { makeWorkingPaths(context).getLogFileOfJob(job.id).delete() }
         cacheOutputPath.delete(job.id.toInt())
     }
 
