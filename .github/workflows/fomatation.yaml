@@ -16,8 +16,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-
-jobs:
   format:
     name: Format Kotlin Code with ktfmt
     runs-on: ubuntu-latest
