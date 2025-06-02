@@ -30,7 +30,7 @@ jobs:
           cache: 'gradle'
 
       - name: Download and Setup the Android SDK
-        uses: android-actions/setup-android@v2
+        uses: android-actions/setup-android@v3
         
       - name: Install CMake in the Android SDK
         # This is the same version of cmake that is found in build.gradle. This
