@@ -1,10 +1,5 @@
 package com.github.khangnt.mcp.annotation;
 
-import android.support.annotation.StringDef;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-
 import static com.github.khangnt.mcp.annotation.Muxer.DNXHD;
 import static com.github.khangnt.mcp.annotation.Muxer.FLAC;
 import static com.github.khangnt.mcp.annotation.Muxer.FLV;
@@ -24,7 +19,13 @@ import static com.github.khangnt.mcp.annotation.Muxer.WAV;
 import static com.github.khangnt.mcp.annotation.Muxer.WEBM;
 import static com.github.khangnt.mcp.annotation.Muxer.WEBVTT;
 
+import android.support.annotation.StringDef;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 /**
+ *
+ *
  * <pre><code>
  * $ ffmpeg -formats
  * File formats:
@@ -60,28 +61,45 @@ import static com.github.khangnt.mcp.annotation.Muxer.WEBVTT;
  * DE webvt
  * </code></pre>
  */
-
 @SuppressWarnings("SpellCheckingInspection")
-@StringDef({DNXHD, FLAC, FLV, GIF, IMAGE2, IMAGE2PIPE, IPOD, MATROSKA, MJPEG, MOV,
-        MP3, MP4, OGG, OPUS, SRT, WAV, WEBM, WEBVTT})
+@StringDef({
+  DNXHD,
+  FLAC,
+  FLV,
+  GIF,
+  IMAGE2,
+  IMAGE2PIPE,
+  IPOD,
+  MATROSKA,
+  MJPEG,
+  MOV,
+  MP3,
+  MP4,
+  OGG,
+  OPUS,
+  SRT,
+  WAV,
+  WEBM,
+  WEBVTT
+})
 @Retention(RetentionPolicy.SOURCE)
 public @interface Muxer {
-    String DNXHD = "dnxhd";
-    String FLAC = "flac";
-    String FLV = "flv";
-    String GIF = "gif";
-    String IMAGE2 = "image2";
-    String IMAGE2PIPE = "image2pipe";
-    String IPOD = "ipod";
-    String MATROSKA = "matroska";
-    String MJPEG = "mjpeg";
-    String MOV = "mov";
-    String MP3 = "mp3";
-    String MP4 = "mp4";
-    String OGG = "ogg";
-    String OPUS = "opus";
-    String SRT = "srt";
-    String WAV = "wav";
-    String WEBM = "webm";
-    String WEBVTT = "webvtt";
+  String DNXHD = "dnxhd";
+  String FLAC = "flac";
+  String FLV = "flv";
+  String GIF = "gif";
+  String IMAGE2 = "image2";
+  String IMAGE2PIPE = "image2pipe";
+  String IPOD = "ipod";
+  String MATROSKA = "matroska";
+  String MJPEG = "mjpeg";
+  String MOV = "mov";
+  String MP3 = "mp3";
+  String MP4 = "mp4";
+  String OGG = "ogg";
+  String OPUS = "opus";
+  String SRT = "srt";
+  String WAV = "wav";
+  String WEBM = "webm";
+  String WEBVTT = "webvtt";
 }

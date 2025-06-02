@@ -1,10 +1,5 @@
 package com.github.khangnt.mcp.annotation;
 
-import android.support.annotation.StringDef;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-
 import static com.github.khangnt.mcp.annotation.Encoders.AAC;
 import static com.github.khangnt.mcp.annotation.Encoders.DNXHD;
 import static com.github.khangnt.mcp.annotation.Encoders.FLAC;
@@ -22,7 +17,13 @@ import static com.github.khangnt.mcp.annotation.Encoders.SRT;
 import static com.github.khangnt.mcp.annotation.Encoders.SUBRIP;
 import static com.github.khangnt.mcp.annotation.Encoders.WEBVTT;
 
+import android.support.annotation.StringDef;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 /**
+ *
+ *
  * <pre><code>
  * $ ffmpeg -encoders
  * Encoders:
@@ -54,24 +55,40 @@ import static com.github.khangnt.mcp.annotation.Encoders.WEBVTT;
  * </code></pre>
  */
 @SuppressWarnings("SpellCheckingInspection")
-@StringDef({DNXHD, FLV, GIF, H263, MJPEG, MPEG4, PNG, AAC, FLAC, LIBMP3LAME, LIBSHINE,
-        LIBOPUS, LIBVORBIS, SRT, SUBRIP, WEBVTT})
+@StringDef({
+  DNXHD,
+  FLV,
+  GIF,
+  H263,
+  MJPEG,
+  MPEG4,
+  PNG,
+  AAC,
+  FLAC,
+  LIBMP3LAME,
+  LIBSHINE,
+  LIBOPUS,
+  LIBVORBIS,
+  SRT,
+  SUBRIP,
+  WEBVTT
+})
 @Retention(RetentionPolicy.SOURCE)
 public @interface Encoders {
-    String DNXHD = "dnxhd";
-    String FLV = "flv";
-    String GIF = "gif";
-    String H263 = "h263";
-    String MJPEG = "mjpeg";
-    String MPEG4 = "mpeg4";
-    String PNG = "png";
-    String AAC = "aac";
-    String FLAC = "flac";
-    String LIBMP3LAME = "libmp3lame";
-    String LIBSHINE = "libshine";
-    String LIBOPUS = "libopus";
-    String LIBVORBIS = "libvorbis";
-    String SRT = "srt";
-    String SUBRIP = "subrip";
-    String WEBVTT = "webvtt";
+  String DNXHD = "dnxhd";
+  String FLV = "flv";
+  String GIF = "gif";
+  String H263 = "h263";
+  String MJPEG = "mjpeg";
+  String MPEG4 = "mpeg4";
+  String PNG = "png";
+  String AAC = "aac";
+  String FLAC = "flac";
+  String LIBMP3LAME = "libmp3lame";
+  String LIBSHINE = "libshine";
+  String LIBOPUS = "libopus";
+  String LIBVORBIS = "libvorbis";
+  String SRT = "srt";
+  String SUBRIP = "subrip";
+  String WEBVTT = "webvtt";
 }
