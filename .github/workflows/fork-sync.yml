@@ -18,7 +18,7 @@ jobs:
       - uses: tgymnich/fork-sync@v2.0
         with:
           token: ${{ github.token }}
-          repo: android-ide-theme-store
+          repo: Android-Media-Converter
           owner: scto
           base: master
           head: master
