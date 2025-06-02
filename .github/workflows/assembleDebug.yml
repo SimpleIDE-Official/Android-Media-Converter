@@ -29,6 +29,22 @@ jobs:
           java-version: 17
           cache: 'gradle'
 
+      - name: Download and Setup the Android SDK
+        uses: android-actions/setup-android@v2
+        
+      - name: Install CMake in the Android SDK
+        # This is the same version of cmake that is found in build.gradle. This
+        # will be used to build libavif and the JNI bindings.
+        run: sdkmanager "cmake;3.22.1"
+
+      - name: Download and Setup the Android NDK
+        uses: nttld/setup-ndk@v1
+        id: setup-ndk
+        with:
+          # r25c is the same as 25.2.9519653.
+          ndk-version: r25c
+          add-to-path: false
+
       - name: Grant Execute Permission
         run: chmod +x ./gradlew
 
