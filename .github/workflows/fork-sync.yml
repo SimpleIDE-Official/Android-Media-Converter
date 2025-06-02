@@ -19,7 +19,6 @@ jobs:
         with:
           #token: ${{ github.token }}
           token: ${{ secrets.PERSONAL_TOKEN }}
-          owner: llvm
           repo: Android-Media-Converter
           owner: scto
           base: master
