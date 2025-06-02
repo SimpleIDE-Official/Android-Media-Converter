@@ -11,6 +11,12 @@ on:
     - cron: '*/30 * * * *' # every 30 minutes
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+
 jobs:
   format:
     name: Format Kotlin Code with ktfmt
