@@ -36,7 +36,7 @@ jobs:
         run: ./gradlew assembleDebug
 
       - name: Upload app Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: app-debug-unsigned-${{ env.SHORT_SHA }}
           path: app/build/outputs/apk/debug/app-debug-unsigned.apk
